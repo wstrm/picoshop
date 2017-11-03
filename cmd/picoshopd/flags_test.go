@@ -1,1 +1,1 @@
-package flags_test
+package main_test
