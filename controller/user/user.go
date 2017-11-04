@@ -1,4 +1,4 @@
-package login
+package user
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ type page struct {
 }
 
 func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	view.Render(writer, "login", &page{Title: "Picoshop"})
+	view.Render(writer, "user", &page{Title: "Picoshop"})
 }
 
 func New() *handler {

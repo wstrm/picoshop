@@ -10,5 +10,6 @@ import (
 func main() {
 	controller := controller.New()
 
-	log.Fatal(http.ListenAndServe(":8080", controller))
+	log.Printf("Listening on: %s", context.address)
+	log.Fatal(http.ListenAndServe(context.address, controller))
 }
