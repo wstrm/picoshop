@@ -10,12 +10,17 @@ type handler struct {
 	http.Handler
 }
 
-type page struct {
-	Title string
-}
-
 func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	view.Render(writer, "register", &page{Title: "Picoshop"})
+	switch request.Method {
+
+	case http.MethodGet: // Serve register view
+		view.Render(writer, "register", view.Page{
+			Title: "Picoshop",
+		})
+
+	case http.MethodPost: // Retreive user registration
+		http.Error(writer, "Not Implemented", http.StatusNotImplemented)
+	}
 }
 
 func New() *handler {

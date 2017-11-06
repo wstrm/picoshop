@@ -10,17 +10,13 @@ type handler struct {
 	http.Handler
 }
 
-type page struct {
-	Title string
-}
-
 func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/" {
 		http.NotFound(writer, request)
 		return
 	}
 
-	view.Render(writer, "home", &page{Title: "Picoshop"})
+	view.Render(writer, "home", view.Page{Title: "Picoshop"})
 }
 
 func New() *handler {

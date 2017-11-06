@@ -10,12 +10,16 @@ type handler struct {
 	http.Handler
 }
 
-type page struct {
-	Title string
-}
-
 func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	view.Render(writer, "article", &page{Title: "Picoshop"})
+	id := request.URL.Query().Get("id")
+
+	if id != "" {
+		// Get article data using ID from model here
+		view.Render(writer, "article", view.Page{Title: "Article - Picoshop", Data: id})
+		return
+	}
+
+	http.NotFound(writer, request)
 }
 
 func New() *handler {

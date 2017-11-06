@@ -9,10 +9,15 @@ const (
 	templateExtension = ".tmpl.html"
 )
 
-var templates = template.Must(template.ParseGlob("./view/*"+templateExtension))
+var templates = template.Must(template.ParseGlob("./view/*" + templateExtension))
 
-func Render(writer http.ResponseWriter, template string, data interface{}) {
-	err := templates.ExecuteTemplate(writer, template+".tmpl.html", data)
+type Page struct {
+	Title string
+	Data  interface{}
+}
+
+func Render(writer http.ResponseWriter, template string, page Page) {
+	err := templates.ExecuteTemplate(writer, template+".tmpl.html", page)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 	}
