@@ -1,4 +1,4 @@
-package register
+package controller
 
 import (
 	"net/http"
@@ -6,11 +6,11 @@ import (
 	"github.com/willeponken/picoshop/view"
 )
 
-type handler struct {
+type registerHandler struct {
 	http.Handler
 }
 
-func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 
 	case http.MethodGet: // Serve register view
@@ -23,6 +23,6 @@ func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func New() *handler {
-	return &handler{}
+func newRegisterHandler() *registerHandler {
+	return &registerHandler{}
 }

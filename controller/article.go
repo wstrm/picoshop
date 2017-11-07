@@ -1,4 +1,4 @@
-package article
+package controller
 
 import (
 	"net/http"
@@ -6,11 +6,11 @@ import (
 	"github.com/willeponken/picoshop/view"
 )
 
-type handler struct {
+type articleHandler struct {
 	http.Handler
 }
 
-func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	id := request.URL.Query().Get("id")
 
 	if id != "" {
@@ -22,6 +22,6 @@ func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	http.NotFound(writer, request)
 }
 
-func New() *handler {
-	return &handler{}
+func newArticleHandler() *articleHandler {
+	return &articleHandler{}
 }

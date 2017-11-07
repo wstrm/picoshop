@@ -1,4 +1,4 @@
-package cart
+package controller
 
 import (
 	"net/http"
@@ -6,11 +6,11 @@ import (
 	"github.com/willeponken/picoshop/view"
 )
 
-type handler struct {
+type cartHandler struct {
 	http.Handler
 }
 
-func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet: // View cart
 		view.Render(writer, "cart", view.Page{Title: "Picoshop"})
@@ -34,6 +34,6 @@ func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func New() *handler {
-	return &handler{}
+func newCartHandler() *cartHandler {
+	return &cartHandler{}
 }
