@@ -45,18 +45,38 @@ ul.horizontal-navbar li {
 	height: 70px;
 }
 
-ul.horizontal-navbar li.logo a {
+ul.horizontal-navbar li.logo a span.text {
 	font-family: 'Get Schwifty', sans-serif;
 	font-size: 2em;
-	margin-top: 0;
+	display: block;
+	float: left;
+	margin-top: 18px;
+	margin-left: 10px;
+}
+
+ul.horizontal-navbar li.logo a {
+	padding: 0px 16px;
+}
+
+ul.horizontal-navbar li.logo a span.circle {
+	display: block;
+	float: left;
+	width: 62px;
+	height: 62px;
+	background-color: #ebfbd7;
+	border-radius: 31px;
+	-moz-border-radius: 31px;
+	-webkit-border-radius: 31px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #000;
 }
 
 ul.horizontal-navbar li.logo a img {
-	display: inline;
+	display: block;
 	height: 53px;
-	margin-top: -18px;
-	margin-bottom: -18px;
-	margin-left: -18px;
+	margin-top: 6px;
+	margin-left: -9px;
 }
 
 ul.horizontal-navbar li a {
