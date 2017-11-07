@@ -60,7 +60,7 @@ ul.horizontal-navbar li.logo a img {
 }
 
 ul.horizontal-navbar li a {
-	font-family: sans-serif;
+	font-family: 'Gloria Hallelujah', cursive;
 	text-transform: uppercase;
 	font-weight: bold;
 	color: #ebfbd7;
@@ -69,7 +69,7 @@ ul.horizontal-navbar li a {
 	text-align: center;
 	padding: 19px 16px;
 	text-decoration: none;
-	margin-top: 6px;
+	margin-top: 2px;
 }
 
 ul.horizontal-navbar li:hover:not(.active) {
@@ -86,7 +86,7 @@ ul.horizontal-navbar li.right {
 
 /* vertical-navbar */
 ul.vertical-navbar li a {
-	font-family: 'Gloria Hallelujah', cursive;;
+	font-family: 'Gloria Hallelujah', cursive;
 	color: black;
 	display: block;
 	padding: 4px 26px;
@@ -98,13 +98,12 @@ ul.vertical-navbar li:hover a {
 }
 
 ul.vertical-navbar li.category a {
-	font-family: sans-serif;
 	text-transform: uppercase;
 	font-weight: bold;
 	display: block;
 	padding-left: 16px;
-	padding-top: 16px;
-	padding-bottom: 8px;
+	padding-top: 10px;
+	padding-bottom: 2px;
 	margin-top: 16px;
 	margin-bottom: 4px;
 	color: #ebfbd7;
