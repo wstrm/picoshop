@@ -10,8 +10,11 @@ Minimalistic web shop.
 ## Project structure
 
 ### Code
+![Code project structure tree](https://github.com/willeponken/picoshop/blob/master/doc/patterns/picoshop-project-structure_rev1.png)
+
 <details>
 <summary>Description</summary>
+
  * /cmd - main entry points for each binary
  * /controller - routes according to MVC pattern
  * /doc - documentation
@@ -20,9 +23,8 @@ Minimalistic web shop.
  * /static - content that is served by the web server
  * /tool - developer utilities
  * /view - HTML views that are rendered for each web page
-</details>
 
-![Code project structure tree](https://github.com/willeponken/picoshop/blob/master/doc/patterns/picoshop-project-structure_rev1.png)
+</details>
 
 ### Database
 ![Database ER scheme](https://github.com/willeponken/picoshop/blob/master/doc/database/picoshop_sql-er-diagram_rev2.png)
