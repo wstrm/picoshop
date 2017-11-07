@@ -13,6 +13,7 @@ func New() *http.ServeMux {
 	mux.Handle("/user", newUserHandler())
 	mux.Handle("/article", newArticleHandler())
 	mux.Handle("/cart", newCartHandler())
+	mux.Handle("/static/", newStaticHandler())
 
 	return mux
 }

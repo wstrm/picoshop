@@ -1,0 +1,160 @@
+@font-face {
+	font-family: 'Get Schwifty';
+	src: url(/static/get-schwifty.ttf);
+}
+
+@font-face {
+	font-family: 'Gloria Hallelujah';
+	src: url(/static/GloriaHallelujah.ttf);
+}
+
+@font-face {
+	font-family: 'Glegoo';
+	font-style: normal;
+	src: url(/static/Glegoo-Regular.ttf);
+}
+
+@font-face {
+	font-family: 'Glegoo';
+	font-style: bold;
+	src: url(/static/Glegoo-Bold);
+}
+
+/* default body style */
+body {
+	margin: 0;
+}
+
+/* horizontal-navbar */
+ul.horizontal-navbar {
+	list-style-type: none;
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-right: 5%;
+	padding-left: 5%;
+	overflow: hidden;
+	background-color: #5c8b23;
+	box-shadow: 0px 2px 8px #888888;
+	position: relative;
+	z-index: 2;
+}
+
+ul.horizontal-navbar li {
+	float: left;
+	height: 70px;
+}
+
+ul.horizontal-navbar li.logo a {
+	font-family: 'Get Schwifty', sans-serif;
+	font-size: 2em;
+	margin-top: 0;
+}
+
+ul.horizontal-navbar li.logo a img {
+	display: inline;
+	height: 53px;
+	margin-top: -18px;
+	margin-bottom: -18px;
+	margin-left: -18px;
+}
+
+ul.horizontal-navbar li a {
+	font-family: sans-serif;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #ebfbd7;
+	display: block;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+	text-align: center;
+	padding: 19px 16px;
+	text-decoration: none;
+	margin-top: 6px;
+}
+
+ul.horizontal-navbar li:hover:not(.active) {
+	background-color: #486913;
+}
+
+ul.horizontal-navbar li.active {
+	background-color: #486913;
+}
+
+ul.horizontal-navbar li.right {
+	float: right;
+}
+
+/* vertical-navbar */
+ul.vertical-navbar li a {
+	font-family: 'Gloria Hallelujah', cursive;;
+	color: black;
+	display: block;
+	padding: 4px 26px;
+	text-decoration: none;
+}
+
+ul.vertical-navbar li:hover a {
+	color: white;
+}
+
+ul.vertical-navbar li.category a {
+	font-family: sans-serif;
+	text-transform: uppercase;
+	font-weight: bold;
+	display: block;
+	padding-left: 16px;
+	padding-top: 16px;
+	padding-bottom: 8px;
+	margin-top: 16px;
+	margin-bottom: 4px;
+	color: #ebfbd7;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+}
+
+ul.vertical-navbar li.category {
+	background-color: #5c8b23;
+}
+
+ul.vertical-navbar li.active {
+	background-color: #4caf50;
+	color: white;
+}
+
+ul.vertical-navbar li {
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #b0ce88;
+}
+
+ul.vertical-navbar li:hover:not(.active) {
+	background-color: #5c8b23;
+	color: #ffffff;
+}
+
+ul.vertical-navbar {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 200px;
+	background-color: #ebfbd7;
+	position: fixed;
+	height: 100%;
+	overflow: auto;
+	z-index: 1;
+	box-shadow: 0px 1px 6px #888888;
+}
+
+ul.vertical-navbar li a.bestseller::after {
+	content: " Bestseller!";
+	font-style: italic;
+	font-size: 0.8em;
+	position: relative;
+	bottom: 0.5ex;
+	color: red;
+}
+
+/* main content */
+div.main {
+	margin-left: 200px;
+	padding: 1px 16px;
+}
