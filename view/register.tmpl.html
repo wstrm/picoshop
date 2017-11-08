@@ -1,6 +1,38 @@
 {{ template "header" . }}
 
-<h1>Picoshop</h1>
-<p>Welcome to Picoshop!</p>
+<div class="smallbox">
+  <h1>Register :)</h1>
+
+  <p>
+  O hai! Register today for fast checkouts and great offers.
+  </p>
+
+  {{ template "error" .Data.Error }}
+
+  <form action="/register" method="post">
+    <div>
+      <label for="email">E-mail:</label>
+      <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+    </div>
+    <div>
+      <label for="password-retype">Re-type password:</label>
+      <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+    </div>
+
+    <div>
+      <button type="submit">Register</button>
+    </div>
+  </form>
+
+  <p>
+  <small>
+    All personal records are stored in a <strong>über</strong> secure MySQL database with <em>state of the art</em> encryption.
+  </small>
+  </p>
+</div>
 
 {{ template "footer" }}

@@ -10,19 +10,108 @@
 
 @font-face {
 	font-family: 'Glegoo';
-	font-style: normal;
+	font-weight: normal;
 	src: url(/static/Glegoo-Regular.ttf);
 }
 
 @font-face {
 	font-family: 'Glegoo';
-	font-style: bold;
-	src: url(/static/Glegoo-Bold);
+	font-weight: bold;
+	src: url(/static/Glegoo-Bold.ttf);
 }
 
 /* default body style */
 body {
 	margin: 0;
+}
+
+p, label, input, textarea, button {
+	font-family: 'Glegoo', cursive;
+}
+
+h1, h2, h3, h4, h5 {
+	font-family: 'Gloria Hallelujah', cursive;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+/* form */
+form {
+	margin: 0 auto;
+	width: 400px;
+	padding: 1em;
+	border: 1px solid #b0ce88;
+	background-color: #ebfbd7;
+	box-shadow: 0px 1px 4px #888888;
+}
+
+form div + div {
+	margin-top: 1em;
+}
+
+form label {
+	display: inline-block;
+	width: 90px;
+	text-align: right;
+	margin-right: 6px;
+}
+
+form input:focus, textarea:focus {
+	border-color: #5c8b23;
+}
+
+form input, textarea {
+	width: 300px;
+	box-sizing: border-box;
+	border: 1px solid #b0ce88;
+}
+
+form button {
+	margin-left: 90px; /* backup for older browsers */
+	margin-left: calc(96px + 0.3em);
+}
+
+/* button */
+button {
+	background-color: #5c8b23;
+	color: white;
+	padding: 2px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border: 2px solid #5c8b23;
+}
+
+button:hover {
+	background-color: #ebfbd7; 
+	color: black; 
+}
+
+/* smallbox */
+div.smallbox {
+	margin: 0 auto;
+	width: 500px;
+}
+
+/* midbox */
+div.midbox {
+	margin: 0 auto;
+	width: 700px;
+}
+
+/* bigbox */
+div.bigbox {
+	margin: 0 auto;
+	width: 900px;
+}
+
+/* error */
+span.error {
+	color: red;
+	font-weight: bold;
 }
 
 /* horizontal-navbar */

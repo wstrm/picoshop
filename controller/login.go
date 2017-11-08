@@ -10,16 +10,57 @@ type loginHandler struct {
 	http.Handler
 }
 
+type loginData struct {
+	Error    string
+	Email    string
+	Password string
+}
+
+func renderLogin(writer http.ResponseWriter, code int, data interface{}) {
+	writer.WriteHeader(code)
+
+	if data == nil {
+		data = loginData{}
+	}
+
+	page := view.Page{
+		Title: "Login - Picoshop",
+		Data:  data,
+	}
+
+	view.Render(writer, "login", page)
+}
+
 func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet:
-		view.Render(writer, "login", view.Page{Title: "Picoshop"})
+		renderLogin(writer, http.StatusOK, nil)
 
 	case http.MethodPost:
-		http.Error(writer, "", http.StatusNotImplemented)
+		err := request.ParseForm()
+		if err != nil {
+			renderLogin(writer, http.StatusBadRequest, loginData{
+				Error: "invalid form data",
+			})
+			return
+		}
+
+		email := request.PostFormValue("email")
+		password := request.PostFormValue("password")
+
+		if email == "" || password == "" {
+			renderLogin(writer, http.StatusBadRequest, loginData{
+				Error:    "all fields must be filled",
+				Email:    email,
+				Password: password,
+			})
+			return
+		}
+
+		http.Error(writer, "Not Implemented", http.StatusNotImplemented)
 
 	default:
-		http.Error(writer, "", http.StatusMethodNotAllowed)
+		http.Error(writer, "Not Allowed", http.StatusMethodNotAllowed)
 	}
 }
 
