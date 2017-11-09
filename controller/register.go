@@ -45,16 +45,6 @@ func validatePassword(password, passwordRetype string) error {
 	return nil
 }
 
-func validateFilledFields(fields ...string) error {
-	for _, field := range fields {
-		if field == "" {
-			return errors.New("all fields must be filled")
-		}
-	}
-
-	return nil
-}
-
 func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 
@@ -74,7 +64,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		password := request.PostFormValue("password")
 		passwordRetype := request.PostFormValue("password-retype")
 
-		if err := validateFilledFields(email, password, passwordRetype); err != nil {
+		if err := isFilled(email, password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
 				Error:          err.Error(),
 				Email:          email,
