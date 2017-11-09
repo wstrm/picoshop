@@ -41,7 +41,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 	case http.MethodPost: // Retreive user registration
 		err := request.ParseForm()
 		if err != nil {
-			renderLogin(writer, http.StatusBadRequest, registerData{
+			renderRegister(writer, http.StatusBadRequest, registerData{
 				Error: "invalid form data",
 			})
 			return
