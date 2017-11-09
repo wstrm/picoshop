@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/willeponken/picoshop/view"
@@ -32,6 +33,28 @@ func renderRegister(writer http.ResponseWriter, code int, data interface{}) {
 	view.Render(writer, "register", page)
 }
 
+func validatePassword(password, passwordRetype string) error {
+	if password != passwordRetype {
+		return errors.New("re-typed password must equal original")
+	}
+
+	if len(password) < 8 {
+		return errors.New("password must be atleast 8 characters long")
+	}
+
+	return nil
+}
+
+func validateFilledFields(fields ...string) error {
+	for _, field := range fields {
+		if field == "" {
+			return errors.New("all fields must be filled")
+		}
+	}
+
+	return nil
+}
+
 func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 
@@ -51,9 +74,9 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		password := request.PostFormValue("password")
 		passwordRetype := request.PostFormValue("password-retype")
 
-		if email == "" || password == "" || passwordRetype == "" {
+		if err := validateFilledFields(email, password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
-				Error:          "all fields must be filled",
+				Error:          err.Error(),
 				Email:          email,
 				Password:       password,
 				PasswordRetype: passwordRetype,
@@ -61,9 +84,9 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		if password != passwordRetype {
+		if err := validatePassword(password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
-				Error: "re-typed password must equal original",
+				Error: err.Error(),
 				Email: email,
 				// Ignore passwords (force the user to retype invalid data)
 			})
