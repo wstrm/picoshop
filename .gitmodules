@@ -1,0 +1,3 @@
+[submodule "doc/report"]
+	path = doc/report
+	url = git@github.com:willeponken/picoshop-report.git

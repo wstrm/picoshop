@@ -3,13 +3,19 @@ package view
 import (
 	"html/template"
 	"net/http"
+	"path/filepath"
+	"runtime"
 )
 
 const (
 	templateExtension = ".tmpl.html"
 )
 
-var templates = template.Must(template.ParseGlob("./view/*" + templateExtension))
+var (
+	_, binpath, _, _ = runtime.Caller(0)
+	basepath         = filepath.Dir(binpath)
+	templates        = template.Must(template.ParseGlob(basepath + "/*" + templateExtension))
+)
 
 type Page struct {
 	Title string

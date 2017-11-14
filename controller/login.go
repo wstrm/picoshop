@@ -48,7 +48,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		email := request.PostFormValue("email")
 		password := request.PostFormValue("password")
 
-		if err := isFilled(email, password); err != nil {
+		if err := IsFilled(email, password); err != nil {
 			renderLogin(writer, http.StatusBadRequest, loginData{
 				Error:    err.Error(),
 				Email:    email,

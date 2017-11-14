@@ -64,7 +64,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		password := request.PostFormValue("password")
 		passwordRetype := request.PostFormValue("password-retype")
 
-		if err := isFilled(email, password, passwordRetype); err != nil {
+		if err := IsFilled(email, password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
 				Error:          err.Error(),
 				Email:          email,
