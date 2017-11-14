@@ -3,6 +3,9 @@ language: go
 go:
 - 1.9.x
 
+git:
+  submodules: false
+
 install:
 - ./tool/init.sh
 
