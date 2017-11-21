@@ -2,6 +2,14 @@ picoshop
 ========
 Minimalistic web shop.
 
+## Setup development environment
+### Prerequisites
+ * Download and install Go
+
+### Dependency management
+ * Install dep `go get -u github.com/golang/dep/cmd/dep`
+ * Run `dep ensure` and you're good to go!
+
 ## Project status
 | Build status | Test coverage |
 |:------------:|:-------------:|
