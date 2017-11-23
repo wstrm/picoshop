@@ -35,4 +35,4 @@ Minimalistic web shop.
 </details>
 
 ### Database
-![Database ER scheme](https://github.com/willeponken/picoshop/blob/master/doc/database/picoshop_sql-er-diagram_rev2.png)
+![Database ER scheme](https://github.com/willeponken/picoshop/blob/master/doc/database/picoshop_mysql-sql-eer-diagram_rev3.png)
