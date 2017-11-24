@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS `user` (
 	email VARCHAR(255) NOT NULL,
 	hash VARCHAR(255) NOT NULL,
 	name VARCHAR(255) NOT NULL,
-	phone_number INT,
+	phone_number VARCHAR(50),
 	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	addresses INT NOT NULL);
+	addresses INT NULL);
 
 /* Create comments table */
 CREATE TABLE IF NOT EXISTS comments (
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS article (
 	description VARCHAR(255) NOT NULL,
 	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
 	image_url VARCHAR(255) NOT NULL,
-	comments INT);
+	comments INT NULL);
 
 /* Create order_has_articles table */
 CREATE TABLE IF NOT EXISTS order_has_articles (
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS customer_has_orders (
 		REFERENCES `order`(id),
 
 	id INT AUTO_INCREMENT,
-	`order` INT);
+	`order` INT NULL);
 
 /* Create customer table */
 CREATE TABLE IF NOT EXISTS customer (
@@ -108,10 +108,9 @@ CREATE TABLE IF NOT EXISTS customer (
 		REFERENCES customer_has_orders(id),
 
 	id INT AUTO_INCREMENT,
-	password VARCHAR(255) NOT NULL,
-	credit_card INT NOT NULL,
+	credit_card VARBINARY(255) NOT NULL,
 	user INT NOT NULL,
-	orders INT);
+	orders INT NULL);
 
 /* Create admin table */
 CREATE TABLE IF NOT EXISTS admin (

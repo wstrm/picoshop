@@ -2,8 +2,11 @@ package controller
 
 import (
 	"errors"
+	"log"
 	"net/http"
+	"time"
 
+	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
 
@@ -83,7 +86,29 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		http.Error(writer, "Not Implemented", http.StatusNotImplemented)
+		customer, err := model.PutCustomer(model.Customer{
+			User: model.User{
+				Email:       email,
+				Name:        "A name",         //TODO implement name on client side
+				Hash:        password,         //TODO bcrypt
+				PhoneNumber: "A phone number", //TODO see above
+				CreateTime:  time.Now(),
+			},
+			CreditCard: 0, //TODO credit inster
+		})
+
+		if err != nil {
+			log.Println(err)
+			renderRegister(writer, http.StatusInternalServerError, registerData{
+				Error: errors.New("Something internal went wrong!").Error(),
+				// Ignore data, apparently it's dangerous!
+			})
+			return
+		}
+
+		log.Println(customer)
+
+		http.Redirect(writer, request, "/", http.StatusSeeOther) // See RFC 2616 (redirect after POST)
 	}
 }
 
