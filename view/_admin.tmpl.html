@@ -1,0 +1,67 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+    <h3>Warehouse</h3>
+    <form action="/register?type=warehouse" method="post">
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+        </div>
+        <div>
+            <label for="password-retype">Re-type password:</label>
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+        </div>
+
+        <div>
+            <button type="submit">Register</button>
+        </div>
+    </form>
+
+
+    <h3>Admin</h3>
+    <form action="/register?type=admin" method="post">
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+        </div>
+        <div>
+            <label for="password-retype">Re-type password:</label>
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+        </div>
+
+        <div>
+            <button type="submit">Register</button>
+        </div>
+    </form>
+
+
+    <h3>User</h3>
+    <form action="/register?type=customer" method="post">
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+        </div>
+        <div>
+            <label for="password-retype">Re-type password:</label>
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+        </div>
+
+        <div>
+            <button type="submit">Register</button>
+        </div>
+    </form>
+</div>
+
+{{ template "header"  }}
