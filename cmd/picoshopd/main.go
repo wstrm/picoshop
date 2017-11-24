@@ -22,6 +22,7 @@ var context = flags{
 func init() {
 	flag.StringVar(&context.address, "address", context.address, "Listen address for web server")
 	flag.StringVar(&context.source, "source", context.source, "Database connection source")
+	flag.Parse()
 }
 
 func main() {

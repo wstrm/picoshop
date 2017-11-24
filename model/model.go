@@ -15,6 +15,7 @@ var database *sql.DB
 // driver defines a SQL driver to use
 const driver = "mysql"
 
+//go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
 // Open initializes a database connection
 func Open(source string) error {
 	db, err := sql.Open(driver, source)
