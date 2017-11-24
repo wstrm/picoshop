@@ -10,6 +10,22 @@ Minimalistic web shop.
  * Install dep `go get -u github.com/golang/dep/cmd/dep`
  * Run `dep ensure` and you're good to go!
 
+### Database setup
+Picoshop forward engineers table creation. You have to create the schema and user though.
+#### Create schema
+```sql
+CREATE SCHEMA IF NOT EXISTS picoshop DEFAULT CHARACTER SET utf8;
+```
+
+#### Create user
+```sql
+CREATE USER picoshop@localhost IDENTIFIED BY '<password here>';
+GRANT GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,REFERENCES,INDEX,EVENT,DROP,TRIGGER,EXECUTE,SHOW VIEW,CREATE VIEW,CREATE ROUTINE,ALTER ROUTINE,EVENT ON picoshop.* TO picoshop@localhost;
+```
+
+### Run Picoshop
+ * Run `picoshopd` with `go run cmd/picoshopd/main.go -address=:9090 -source 'picoshop:<password here>@tcp(127.0.0.1:3306)/picoshop'`
+
 ## Project status
 | Build status | Test coverage |
 |:------------:|:-------------:|

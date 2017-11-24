@@ -16,13 +16,17 @@ type flags struct {
 
 var context = flags{
 	address: ":8080",
-	source:  "root:toor@tcp(127.0.0.1:3306)/picoshopdb",
+	source:  "",
 }
 
 func init() {
 	flag.StringVar(&context.address, "address", context.address, "Listen address for web server")
 	flag.StringVar(&context.source, "source", context.source, "Database connection source")
 	flag.Parse()
+
+	if context.source == "" {
+		log.Fatalln("Please define a MySQL source, example: -source user:password@tcp(127.0.0.1:3306)/picoshop")
+	}
 }
 
 func main() {

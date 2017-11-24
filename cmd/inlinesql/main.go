@@ -34,6 +34,10 @@ func main() {
 	removeComments := regexp.MustCompile("(?s)--.*?\n|/\\*.*?\\*/")
 	queries := strings.Split(strings.Replace(strings.Replace(string(removeComments.ReplaceAll(sqlFile, nil)), "\n", "", -1), "\t", " ", -1), ";")
 
+	if queries[len(queries)-1] == "" {
+		queries = queries[:len(queries)-1]
+	}
+
 	outFile, err := os.Create(out)
 	if err != nil {
 		log.Fatalln(err)

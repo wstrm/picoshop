@@ -2,12 +2,8 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-/* Create picoshopd schema */
-CREATE SCHEMA IF NOT EXISTS picoshop DEFAULT CHARACTER SET utf8;
-USE picoshop;
-
 /* Create address table */
-CREATE TABLE IF NOT EXISTS picoshop.address (
+CREATE TABLE IF NOT EXISTS address (
 	PRIMARY KEY (id),
 
 	id INT AUTO_INCREMENT,
@@ -17,18 +13,18 @@ CREATE TABLE IF NOT EXISTS picoshop.address (
 	country VARCHAR(255) NOT NULL);
 
 /* Create user_has_address table */
-CREATE TABLE IF NOT EXISTS picoshop.user_has_address (
+CREATE TABLE IF NOT EXISTS user_has_address (
 	PRIMARY KEY (id),
-	FOREIGN KEY (address) REFERENCES picoshop.address(id),
+	FOREIGN KEY (address) REFERENCES address(id),
 
 	id INT AUTO_INCREMENT,
 	address INT NOT NULL);
 
 /* Create user table */
-CREATE TABLE IF NOT EXISTS picoshop.user (
+CREATE TABLE IF NOT EXISTS `user` (
 	PRIMARY KEY (id),
 	FOREIGN KEY (addresses)
-		REFERENCES picoshop.user_has_address(id)
+		REFERENCES user_has_address(id)
 		ON DELETE CASCADE,
 
 	UNIQUE INDEX uc_email (email ASC),
@@ -42,10 +38,10 @@ CREATE TABLE IF NOT EXISTS picoshop.user (
 	addresses INT NOT NULL);
 
 /* Create comments table */
-CREATE TABLE IF NOT EXISTS picoshop.comments (
+CREATE TABLE IF NOT EXISTS comments (
 	PRIMARY KEY (id),
 	FOREIGN KEY (customer)
-		REFERENCES picoshop.customer(id),
+		REFERENCES customer(id),
 
 	id INT NOT NULL,
 	rating DECIMAL(10, 0) NOT NULL, -- rating between 0-10 stars
@@ -54,10 +50,10 @@ CREATE TABLE IF NOT EXISTS picoshop.comments (
 	customer INT NOT NULL);
 
 /* Create article table */
-CREATE TABLE IF NOT EXISTS picoshop.article (
+CREATE TABLE IF NOT EXISTS article (
 	PRIMARY KEY (id),
 	FOREIGN KEY (comments)
-		REFERENCES picoshop.comments(id),
+		REFERENCES comments(id),
 
 	id INT NOT NULL,
 	name VARCHAR(255) NOT NULL,
@@ -67,24 +63,24 @@ CREATE TABLE IF NOT EXISTS picoshop.article (
 	comments INT);
 
 /* Create order_has_articles table */
-CREATE TABLE IF NOT EXISTS picoshop.order_has_articles (
+CREATE TABLE IF NOT EXISTS order_has_articles (
 	PRIMARY KEY(id),
 	FOREIGN KEY(article)
-		REFERENCES picoshop.article(id),
+		REFERENCES article(id),
 
 	id INT NOT NULL,
 	article INT NOT NULL
 	);
 
 /* Create order table */
-CREATE TABLE IF NOT EXISTS picoshop.order (
+CREATE TABLE IF NOT EXISTS `order` (
 	PRIMARY KEY (id),
 	FOREIGN KEY (customer)
-		REFERENCES picoshop.customer(id),
+		REFERENCES customer(id),
 	FOREIGN KEY (address)
-		REFERENCES picoshop.address(id),
+		REFERENCES address(id),
 	FOREIGN KEY (articles)
-		REFERENCES picoshop.order_has_articles(id),
+		REFERENCES order_has_articles(id),
 
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
@@ -94,22 +90,22 @@ CREATE TABLE IF NOT EXISTS picoshop.order (
 	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create user_has_orders table */
-CREATE TABLE IF NOT EXISTS picoshop.customer_has_orders (
+CREATE TABLE IF NOT EXISTS customer_has_orders (
 	PRIMARY KEY (id),
 	FOREIGN KEY (`order`)
-		REFERENCES picoshop.order(id),
+		REFERENCES `order`(id),
 
 	id INT AUTO_INCREMENT,
 	`order` INT);
 
 /* Create customer table */
-CREATE TABLE IF NOT EXISTS picoshop.customer (
+CREATE TABLE IF NOT EXISTS customer (
 	PRIMARY KEY (id),
 	FOREIGN KEY (user)
-		REFERENCES picoshop.user(id)
+		REFERENCES user(id)
 		ON DELETE CASCADE,
 	FOREIGN KEY (orders)
-		REFERENCES picoshop.customer_has_orders(id),
+		REFERENCES customer_has_orders(id),
 
 	id INT AUTO_INCREMENT,
 	password VARCHAR(255) NOT NULL,
@@ -118,20 +114,20 @@ CREATE TABLE IF NOT EXISTS picoshop.customer (
 	orders INT);
 
 /* Create admin table */
-CREATE TABLE IF NOT EXISTS picoshop.admin (
+CREATE TABLE IF NOT EXISTS admin (
 	PRIMARY KEY (id),
 	FOREIGN KEY (user)
-		REFERENCES picoshop.user(id)
+		REFERENCES user(id)
 		ON DELETE CASCADE,
 
 	id INT AUTO_INCREMENT NOT NULL,
 	user INT NOT NULL);
 
 /* Create warehouse table */
-CREATE TABLE IF NOT EXISTS picoshop.warehouse (
+CREATE TABLE IF NOT EXISTS warehouse (
 	PRIMARY KEY (id),
 	FOREIGN KEY (user)
-		REFERENCES picoshop.user(id)
+		REFERENCES user(id)
 		ON DELETE CASCADE,
 
 	id INT AUTO_INCREMENT NOT NULL,

@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +17,7 @@ var database *sql.DB
 const driver = "mysql"
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
-// Open initializes a database connection
+// Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
 func Open(source string) error {
 	db, err := sql.Open(driver, source)
 	if err != nil {
@@ -25,6 +26,15 @@ func Open(source string) error {
 	defer graceful(db.Close)
 
 	database = db
+
+	// Initialize database
+	initQueries := getQueries()
+	for _, query := range initQueries {
+		_, err := database.Exec(query)
+		if err != nil {
+			return fmt.Errorf("for sql query: %s, got answer: %v", query, err)
+		}
+	}
 
 	return nil
 }
