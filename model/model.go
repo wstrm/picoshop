@@ -51,6 +51,14 @@ type Customer struct {
 	Orders int64
 }
 
+type Order struct {
+	Customer   int
+	Address    int
+	Articles   int
+	Status     int
+	CreateTime time.Time
+}
+
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
 // Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
 func Open(source string) error {
@@ -231,4 +239,32 @@ func PutCustomer(customer Customer) (Customer, error) {
 	}
 
 	return customer, nil
+}
+
+func GetOrders() (orders []Order, err error) {
+	rows, err := database.Query(`
+		SELECT customer, address, articles, status, create_time FROM .order`)
+	defer rows.Close()
+
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		order := Order{}
+
+		err = rows.Scan(&order.Customer, &order.Address, &order.Articles)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		orders = append(orders, order)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return
+	}
+
+	return
 }
