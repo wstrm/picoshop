@@ -172,3 +172,46 @@ func (manager *Manager) Start(writer http.ReponseWriter, request *http.Request) 
 
 	return
 }
+
+func (manager *Manager) DestroySession(writer http.ResponseWriter, request *http.Request) {
+	cookie, err := request.Cookie(manager.cookieName)
+	if err != nil || cookie.Value == "" {
+		return
+	} else {
+		manager.mutex.Lock()
+		defer manager.mutex.Unlock()
+
+		storage.Destroy(cookie.Value)
+		expiration := time.Now()
+
+		cookie := http.Cookie{
+			Name:     manager.cookieName,
+			Path:     "/",
+			HttpOnly: true,
+			Expires:  expiration,
+			MaxAge:   -1,
+		}
+
+		http.SetCookie(writer, &cookie)
+	}
+}
+
+func (manager *Manager) garbageCollect() {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	storage.garbageCollect(manager.maxLifeTime)
+
+	time.AfterFunc(time.Duration(manager.maxLifeTime), func() { manager.garbageCollect() })
+}
+
+func NewManager(cookieName string, maxLifeTime int64) (*Manager, error) {
+	manager := &Manager{
+		cookieName:  cookieName,
+		maxLifeTime: maxLifeTime,
+	}
+
+	go manager.garbageCollect()
+
+	return manager
+}
