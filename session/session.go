@@ -11,20 +11,18 @@ import (
 	"time"
 )
 
-var globalSessions *Manager
-var globalStorage *Storage
+var storage *Storage
 
 func init() {
-	sessions = &Manager{
-		storage: &Storage{},
+	storage = &Storage{
+		list: list.New(),
 	}
 }
 
 type Manager struct {
-	cookieName   string
-	sessionMutex sync.Mutex
-	storage      *Storage
-	maxLifeTime  int64
+	cookieName  string
+	mutex       sync.Mutex
+	maxLifeTime int64
 }
 
 type Storage struct {
@@ -39,34 +37,106 @@ type Session struct {
 	value      map[interface{}]interface{}
 }
 
-func (storage *Storage) Init(sessionId string) (Session, error) {
+func (store *Storage) Init(sessionId string) Session {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
 
+	value := make(map[interface{}]interface{}, 0)
+	session := &Session{id: sessionId, lastAccess: time.Now(), value: value}
+	element := store.list.PushBack(session)
+	store.sessions[sessionId] = element
+
+	return session
 }
 
-func (storage *Storage) Read(sessionId string) (Session, error) {
+func (store *Storage) Read(sessionId string) (Session, error) {
+	store.mutex.Lock() // do not defer Unlock() due to Storage.Init(sessionId)
 
+	if element, ok := store.sessions[sessionsId]; ok {
+		defer store.mutex.Unlock()
+		return element.Value.(*Session), nil
+	} else {
+		store.mutex.Unlock() // store.Init locks mutex
+		session := store.Init(sessionId)
+		return session, nil
+	}
+
+	store.mutex.Unlock()
+	return nil, nil
 }
 
-func (storage *Storage) Destroy(sessionId string) error {
+func (store *Storage) Destroy(sessionId string) error {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
 
+	if element, ok := store.sessions[sessionId]; ok {
+		delete(store.sessions, sessionId)
+		store.list.Remove(element)
+		return nil
+	}
+
+	return nil
 }
 
-func (storage *Storage) GarbageCollect(maxLifeTime int64) {
+func (store *Storage) GarbageCollect(maxLifeTime int64) {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
 
+	for {
+		element := store.list.Back()
+		if element == nil {
+			break
+		}
+
+		if (element.Value.(*Session).lastAccess.Unix() + maxLifeTime) < time.Now().Unix() {
+			store.list.Remove(element)
+			delete(store.sessions, element.Value.(*Session).id)
+		} else {
+			break
+		}
+	}
 }
 
-func (session *Session) Set(key, value interface{}) error {
+func (store *Storage) Update(sessionId string) error {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+
+	if element, ok := store.sessions[sessionId]; ok {
+		element.Value.(*Session).lastAccess = time.now()
+		store.list.MoveToFront(element)
+		return nil
+	}
+
+	return nil
+}
+
+func (session *Session) Set(key, value interface{}) {
 	session.value[key] = value
 	storage.Update(session.id)
 }
 
 func (session *Session) Get(key, interface{}) interface{} {
+	storage.Update(session.id)
+
+	if value, ok := session.value[key]; ok {
+		return value
+	} else {
+		return nil
+	}
+
+	return nil
 }
 
 func (session *Session) Delete(key interface{}) error {
+	delete(session.value, key)
+
+	storage.Update(session.id)
+
+	return nil
 }
 
 func (session *Session) Id() string {
+	return session.id
 }
 
 func generateId() string {
@@ -79,13 +149,13 @@ func generateId() string {
 }
 
 func (manager *Manager) Start(writer http.ReponseWriter, request *http.Request) (session Session) {
-	manager.sessionMutex.Lock()
-	defer manager.sessionMutex.Unlock()
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
 
 	cookie, err := request.Cookie(manager.cookieName)
 	if err != nil || cookie.Value == "" {
 		id := generateId()
-		session, _ = manager.storage.Init(id)
+		session, _ = storage.Init(id)
 		cookie := http.Cookie{
 			Name:     manager.cookieName,
 			Value:    url.QueryEscape(id),
@@ -97,13 +167,8 @@ func (manager *Manager) Start(writer http.ReponseWriter, request *http.Request) 
 		http.SetCookie(writer, &cookie)
 	} else {
 		id, _ := url.QueryUnescape(cookie.Value)
-		session, _ = manager.storage.Read(id)
+		session, _ = storage.Read(id)
 	}
 
 	return
-}
-
-func Wrapper(writer http.ResponseWriter, request *http.Request) {
-	session := globalSessions.Start(writer, request)
-
 }
