@@ -2,9 +2,8 @@ package controller
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
@@ -17,6 +16,8 @@ type registerHandler struct {
 type registerData struct {
 	Error          string
 	Email          string
+	Name           string
+	PhoneNumber    string
 	Password       string
 	PasswordRetype string
 }
@@ -36,7 +37,7 @@ func renderRegister(writer http.ResponseWriter, code int, data interface{}) {
 	view.Render(writer, "register", page)
 }
 
-func validatePassword(password, passwordRetype string) error {
+func legalPassword(password, passwordRetype string) error {
 	if password != passwordRetype {
 		return errors.New("re-typed password must equal original")
 	}
@@ -64,49 +65,52 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		}
 
 		email := request.PostFormValue("email")
+		name := request.PostFormValue("name")
+		phoneNumber := request.PostFormValue("phone-number")
 		password := request.PostFormValue("password")
 		passwordRetype := request.PostFormValue("password-retype")
 
-		if err := IsFilled(email, password, passwordRetype); err != nil {
+		if err := IsFilled(email, name, phoneNumber, password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
 				Error:          err.Error(),
 				Email:          email,
+				Name:           name,
+				PhoneNumber:    phoneNumber,
 				Password:       password,
 				PasswordRetype: passwordRetype,
 			})
 			return
 		}
 
-		if err := validatePassword(password, passwordRetype); err != nil {
+		if err := legalPassword(password, passwordRetype); err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
-				Error: err.Error(),
-				Email: email,
+				Error:       err.Error(),
+				Email:       email,
+				Name:        name,
+				PhoneNumber: phoneNumber,
 				// Ignore passwords (force the user to retype invalid data)
 			})
 			return
 		}
 
-		customer, err := model.PutCustomer(model.Customer{
-			User: model.User{
-				Email:       email,
-				Name:        "A name",         //TODO implement name on client side
-				Hash:        password,         //TODO bcrypt
-				PhoneNumber: "A phone number", //TODO see above
-				CreateTime:  time.Now(),
-			},
-			CreditCard: 0, //TODO credit inster
-		})
-
+		_, err = model.PutCustomer(model.NewCustomer(email, name, password, phoneNumber))
 		if err != nil {
-			log.Println(err)
+			code := getSqlErrorCode(err)
+			var userErr error
+
+			switch code {
+			case DuplicateKeySqlError:
+				userErr = fmt.Errorf("The email address '%s' is already registered", email)
+			default:
+				userErr = errors.New("Something internal went wrong!")
+			}
+
 			renderRegister(writer, http.StatusInternalServerError, registerData{
-				Error: errors.New("Something internal went wrong!").Error(),
+				Error: userErr.Error(),
 				// Ignore data, apparently it's dangerous!
 			})
 			return
 		}
-
-		log.Println(customer)
 
 		http.Redirect(writer, request, "/", http.StatusSeeOther) // See RFC 2616 (redirect after POST)
 	}

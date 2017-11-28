@@ -8,18 +8,18 @@
             <th>Address</th>
             <th></th>
         </tr>
-            {{range $element := array}}
-            <tr>
-                <td>{{ $element.Id }}</td>
-                <td>{{ $element.OrderArticles }}</td>
-                <td>{{ $element.Address }}</td>
-                <td>
-                    <form action="/order">
-                        <button type="submit">END ORDER</button>
-                    </form>
-                </td>
-            </tr>
-            {{ end }}
+	{{/* <!-- {{range $element := array}} -->
+            <!-- <tr> -->
+            <!--     <td>{{ $element.Id }}</td> -->
+            <!--     <td>{{ $element.OrderArticles }}</td> -->
+            <!--     <td>{{ $element.Address }}</td> -->
+            <!--     <td> -->
+            <!--         <form action="/order"> -->
+            <!--             <button type="submit">END ORDER</button> -->
+            <!--         </form> -->
+            <!--     </td> -->
+            <!-- </tr> -->
+	    <!-- {{ end }} --> */}}
     </table>
 </div>
-{{ template "header" }}
+{{ template "footer" }}

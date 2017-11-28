@@ -10,6 +10,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // sql.DB is thread-safe
@@ -28,7 +29,7 @@ type User struct {
 	Id          int64
 	Email       string
 	Name        string
-	Hash        string
+	Hash        []byte
 	PhoneNumber string
 	CreateTime  time.Time
 	Addresses   int64
@@ -36,16 +37,18 @@ type User struct {
 
 type Admin struct {
 	User
+	Id int64
 }
 
 type Warehouse struct {
 	User
+	Id int64
 }
 
 type Customer struct {
 	User
-	CreditCard int
-	Orders     int64
+	Id     int64
+	Orders int64
 }
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
@@ -87,19 +90,73 @@ func graceful(fn func() error) {
 	}()
 }
 
+func NewUser(email, name, password, phoneNumber string) User {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), -1)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	now := time.Now()
+
+	return User{
+		Email:       email,
+		Name:        name,
+		Hash:        hash,
+		PhoneNumber: phoneNumber,
+		CreateTime:  now,
+	}
+}
+
+func NewCustomer(email, name, password, phoneNumber string) Customer {
+	return Customer{
+		User: NewUser(email, name, password, phoneNumber),
+	}
+}
+
+func ValidPassword(email, password string) bool {
+	hash, err := getUserHash(email)
+	if err != nil {
+		return false
+	}
+
+	err = bcrypt.CompareHashAndPassword(hash, []byte(password))
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func getUserHash(email string) ([]byte, error) {
+	var hash []byte
+
+	err := database.QueryRow(`
+		SELECT (hash) FROM user WHERE (email=LOWER(TRIM(?)))
+	`, email).Scan(&hash)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return hash, nil
+}
+
 func PutUser(user User) (User, error) {
 	result, err := database.Exec(`
 		INSERT INTO user 
-			(email, name, 	hash, 	phone_number, 	create_time)
+			(email, 	name, 	hash, 	phone_number, 	create_time)
 			VALUES
-			(?, 	?,	?, 	?,		?)
+			(LOWER(TRIM(?)), 	?,	?, 	?,		?)
 		`, user.Email, user.Name, user.Hash, user.PhoneNumber, user.CreateTime)
 
 	if err != nil {
 		return User{}, err
 	}
 
-	user.Id, _ = result.LastInsertId()
+	user.Id, err = result.LastInsertId()
+	if err != nil {
+		return User{}, err
+	}
 
 	return user, nil
 }
@@ -116,10 +173,16 @@ func PutAdmin(admin Admin) (Admin, error) {
 			VALUES
 			(?)
 	`, user.Id)
+	if err != nil {
+		return Admin{}, err
+	}
 
-	log.Println(result)
+	admin.Id, err = result.LastInsertId()
+	if err != nil {
+		return Admin{}, err
+	}
 
-	return Admin{}, nil //TODO
+	return admin, nil
 }
 
 func PutWarehouse(warehouse Warehouse) (Warehouse, error) {
@@ -134,10 +197,16 @@ func PutWarehouse(warehouse Warehouse) (Warehouse, error) {
 			VALUES
 			(?)
 	`, user.Id)
+	if err != nil {
+		return Warehouse{}, err
+	}
 
-	log.Println(result)
+	warehouse.Id, err = result.LastInsertId()
+	if err != nil {
+		return Warehouse{}, err
+	}
 
-	return Warehouse{}, nil //TODO
+	return warehouse, nil
 }
 
 func PutCustomer(customer Customer) (Customer, error) {
@@ -148,12 +217,18 @@ func PutCustomer(customer Customer) (Customer, error) {
 
 	result, err := database.Exec(`
 		INSERT INTO customer
-			(user, credit_card)
+			(user)
 			VALUES
-			(?, ?)
-	`, user.Id, customer.CreditCard)
+			(?)
+	`, user.Id)
+	if err != nil {
+		return Customer{}, err
+	}
 
-	log.Println(result)
+	customer.Id, err = result.LastInsertId()
+	if err != nil {
+		return Customer{}, err
+	}
 
-	return Customer{}, nil //TODO
+	return customer, nil
 }

@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
 
@@ -40,7 +42,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		err := request.ParseForm()
 		if err != nil {
 			renderLogin(writer, http.StatusBadRequest, loginData{
-				Error: "invalid form data",
+				Error: "Invalid form data",
 			})
 			return
 		}
@@ -57,7 +59,13 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			return
 		}
 
-		http.Error(writer, "Not Implemented", http.StatusNotImplemented)
+		if model.ValidPassword(email, password) {
+			http.Redirect(writer, request, "/", http.StatusSeeOther)
+		} else {
+			renderLogin(writer, http.StatusUnauthorized, loginData{
+				Error: errors.New("Invalid login credentials").Error(),
+			})
+		}
 
 	default:
 		http.Error(writer, "Not Allowed", http.StatusMethodNotAllowed)
