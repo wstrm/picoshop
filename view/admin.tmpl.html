@@ -65,18 +65,19 @@
 </div>
 
 <h3>Add article</h3>
-<form action="/article" method="post">
+<form action="/article" method="post" enctype="multipart/form-data">
     <div>
-        <label for="E-mail:</label>
-        <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+        <label for="article">Article:</label>
+        <input type="article" id="article" name="article" value="{{ .Data.Article.Name }}">
     </div>
     <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+        <label for="price">Price:</label>
+        <input type="price" id="price" name="price" value="{{ .Data.Article.Price }}">
     </div>
     <div>
-        <label for="password-retype">Re-type password:</label>
-        <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+        <label for="file">Choose file to upload</label>
+    <input type="file" id="file" name="file" multiple>
+
     </div>
 
     <div>

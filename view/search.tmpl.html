@@ -1,0 +1,19 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+    <table class="search">
+        <tr>
+            <th>Article</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    {{range $element := .Data.Orders}}
+        <tr>
+            <td>{{ $element.Article }}</td>
+            <td>{{ $element.Price }}</td>
+            <td>            </td>
+        </tr>
+    {{ end }}
+    </table>
+</div>
+{{ template "footer" }}

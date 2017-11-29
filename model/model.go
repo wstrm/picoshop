@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/tools/go/gcimporter15/testdata"
 )
 
 // sql.DB is thread-safe
@@ -58,6 +59,12 @@ type Order struct {
 	Status     int
 	CreateTime time.Time
 }
+
+type Result struct {
+	Article 	int
+	Price 		int
+}
+
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
 // Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
@@ -266,5 +273,34 @@ func GetOrders() (orders []Order, err error) {
 		return
 	}
 
-	return
+
+}
+
+
+func GetSearchResult(searchingFor string) (results []Result, err error) {
+	rows, err := database.Query(`
+		SELECT name, price FROM .article WHERE name = ?`, searchingFor)
+	defer rows.Close()
+
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		result := Result{}
+
+		err = rows.Scan(&result.Article, &result.Price)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		results = append(results, result)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return
+	}
+
+
 }
