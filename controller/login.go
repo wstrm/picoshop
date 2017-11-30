@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
@@ -16,6 +17,10 @@ type loginData struct {
 	Error    string
 	Email    string
 	Password string
+}
+
+func invalidLoginCredentialsError() error {
+	return errors.New("Invalid login credentials")
 }
 
 func renderLogin(writer http.ResponseWriter, code int, data interface{}) {
@@ -42,7 +47,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		err := request.ParseForm()
 		if err != nil {
 			renderLogin(writer, http.StatusBadRequest, loginData{
-				Error: "Invalid form data",
+				Error: invalidFormDataError().Error(),
 			})
 			return
 		}
@@ -60,10 +65,17 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		}
 
 		if model.ValidPassword(email, password) {
+			err := auth.Login(email, writer, request)
+			if err != nil {
+				renderRegister(writer, http.StatusInternalServerError, registerData{
+					Error: internalServerError().Error(),
+				})
+			}
+
 			http.Redirect(writer, request, "/", http.StatusSeeOther)
 		} else {
 			renderLogin(writer, http.StatusUnauthorized, loginData{
-				Error: errors.New("Invalid login credentials").Error(),
+				Error: invalidLoginCredentialsError().Error(),
 			})
 		}
 

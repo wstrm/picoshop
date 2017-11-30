@@ -19,6 +19,7 @@ var (
 
 type Page struct {
 	Title string
+	User  string
 	Data  interface{}
 }
 
