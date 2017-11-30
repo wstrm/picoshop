@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/willeponken/picoshop/session"
@@ -33,7 +32,6 @@ func getEmail(request *http.Request) (string, error) {
 func injectEmail(writer http.ResponseWriter, request *http.Request, next http.Handler, protected bool) {
 	email, err := getEmail(request)
 	if err != nil {
-		log.Println(err)
 		http.Error(writer, failedToAuthenticateSessionError().Error(),
 			http.StatusInternalServerError)
 		return

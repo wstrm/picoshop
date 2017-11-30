@@ -1,3 +1,7 @@
 /cmd/picoshopd/picoshopd
 /picoshopd
 /coverage.txt
+
+.idea
+*.key
+*.crt
