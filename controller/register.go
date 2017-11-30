@@ -3,8 +3,10 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
@@ -20,6 +22,10 @@ type registerData struct {
 	PhoneNumber    string
 	Password       string
 	PasswordRetype string
+}
+
+func emailAlreadyRegisteredError(email string) error {
+	return fmt.Errorf("The email address '%s' is already registered", email)
 }
 
 func renderRegister(writer http.ResponseWriter, code int, data interface{}) {
@@ -59,7 +65,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		err := request.ParseForm()
 		if err != nil {
 			renderRegister(writer, http.StatusBadRequest, registerData{
-				Error: "invalid form data",
+				Error: invalidFormDataError().Error(),
 			})
 			return
 		}
@@ -100,9 +106,9 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 
 			switch code {
 			case DuplicateKeySqlError:
-				userErr = fmt.Errorf("The email address '%s' is already registered", email)
+				userErr = emailAlreadyRegisteredError(email)
 			default:
-				userErr = errors.New("Something internal went wrong!")
+				userErr = internalServerError()
 			}
 
 			renderRegister(writer, http.StatusInternalServerError, registerData{
@@ -110,6 +116,14 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 				// Ignore data, apparently it's dangerous!
 			})
 			return
+		}
+
+		err = auth.Login(email, writer, request)
+		if err != nil {
+			log.Println(err)
+			renderRegister(writer, http.StatusInternalServerError, registerData{
+				Error: internalServerError().Error(),
+			})
 		}
 
 		http.Redirect(writer, request, "/", http.StatusSeeOther) // See RFC 2616 (redirect after POST)
