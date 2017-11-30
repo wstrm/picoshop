@@ -13,7 +13,7 @@ type userHandler struct {
 func (u *userHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet:
-		view.Render(writer, "user", view.Page{Title: "Picoshop"})
+		view.Render(request.Context(), writer, "user", view.Page{Title: "Picoshop"})
 
 	case http.MethodPost:
 		http.Error(writer, "", http.StatusNotImplemented)

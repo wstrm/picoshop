@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -28,7 +29,7 @@ func emailAlreadyRegisteredError(email string) error {
 	return fmt.Errorf("The email address '%s' is already registered", email)
 }
 
-func renderRegister(writer http.ResponseWriter, code int, data interface{}) {
+func renderRegister(ctx context.Context, writer http.ResponseWriter, code int, data interface{}) {
 	writer.WriteHeader(code)
 
 	if data == nil {
@@ -40,7 +41,7 @@ func renderRegister(writer http.ResponseWriter, code int, data interface{}) {
 		Data:  data,
 	}
 
-	view.Render(writer, "register", page)
+	view.Render(ctx, writer, "register", page)
 }
 
 func legalPassword(password, passwordRetype string) error {
@@ -56,15 +57,16 @@ func legalPassword(password, passwordRetype string) error {
 }
 
 func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	switch request.Method {
+	ctx := request.Context()
 
+	switch request.Method {
 	case http.MethodGet: // Serve register view
-		renderRegister(writer, http.StatusOK, nil)
+		renderRegister(ctx, writer, http.StatusOK, nil)
 
 	case http.MethodPost: // Retreive user registration
 		err := request.ParseForm()
 		if err != nil {
-			renderRegister(writer, http.StatusBadRequest, registerData{
+			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
 				Error: invalidFormDataError().Error(),
 			})
 			return
@@ -77,7 +79,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		passwordRetype := request.PostFormValue("password-retype")
 
 		if err := IsFilled(email, name, phoneNumber, password, passwordRetype); err != nil {
-			renderRegister(writer, http.StatusBadRequest, registerData{
+			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
 				Error:          err.Error(),
 				Email:          email,
 				Name:           name,
@@ -89,7 +91,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		}
 
 		if err := legalPassword(password, passwordRetype); err != nil {
-			renderRegister(writer, http.StatusBadRequest, registerData{
+			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
 				Error:       err.Error(),
 				Email:       email,
 				Name:        name,
@@ -111,7 +113,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 				userErr = internalServerError()
 			}
 
-			renderRegister(writer, http.StatusInternalServerError, registerData{
+			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
 				Error: userErr.Error(),
 				// Ignore data, apparently it's dangerous!
 			})
@@ -121,7 +123,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		err = auth.Login(email, writer, request)
 		if err != nil {
 			log.Println(err)
-			renderRegister(writer, http.StatusInternalServerError, registerData{
+			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
 				Error: internalServerError().Error(),
 			})
 		}

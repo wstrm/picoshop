@@ -13,7 +13,7 @@ type cartHandler struct {
 func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet: // View cart
-		view.Render(writer, "cart", view.Page{Title: "Picoshop"})
+		view.Render(request.Context(), writer, "cart", view.Page{Title: "Picoshop"})
 
 	case http.MethodPost: // Add article to cart
 		http.Error(writer, "", http.StatusNotImplemented)

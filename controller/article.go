@@ -15,7 +15,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 	if id != "" {
 		// Get article data using ID from model here
-		view.Render(writer, "article", view.Page{Title: "Article - Picoshop", Data: id})
+		view.Render(request.Context(), writer, "article", view.Page{Title: "Article - Picoshop", Data: id})
 		return
 	}
 

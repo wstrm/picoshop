@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -23,7 +24,7 @@ func invalidLoginCredentialsError() error {
 	return errors.New("Invalid login credentials")
 }
 
-func renderLogin(writer http.ResponseWriter, code int, data interface{}) {
+func renderLogin(ctx context.Context, writer http.ResponseWriter, code int, data interface{}) {
 	writer.WriteHeader(code)
 
 	if data == nil {
@@ -35,18 +36,20 @@ func renderLogin(writer http.ResponseWriter, code int, data interface{}) {
 		Data:  data,
 	}
 
-	view.Render(writer, "login", page)
+	view.Render(ctx, writer, "login", page)
 }
 
 func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	ctx := request.Context()
+
 	switch request.Method {
 	case http.MethodGet:
-		renderLogin(writer, http.StatusOK, nil)
+		renderLogin(ctx, writer, http.StatusOK, nil)
 
 	case http.MethodPost:
 		err := request.ParseForm()
 		if err != nil {
-			renderLogin(writer, http.StatusBadRequest, loginData{
+			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
 				Error: invalidFormDataError().Error(),
 			})
 			return
@@ -56,7 +59,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		password := request.PostFormValue("password")
 
 		if err := IsFilled(email, password); err != nil {
-			renderLogin(writer, http.StatusBadRequest, loginData{
+			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
 				Error:    err.Error(),
 				Email:    email,
 				Password: password,
@@ -67,14 +70,14 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		if model.ValidPassword(email, password) {
 			err := auth.Login(email, writer, request)
 			if err != nil {
-				renderRegister(writer, http.StatusInternalServerError, registerData{
+				renderLogin(ctx, writer, http.StatusInternalServerError, registerData{
 					Error: internalServerError().Error(),
 				})
 			}
 
 			http.Redirect(writer, request, "/", http.StatusSeeOther)
 		} else {
-			renderLogin(writer, http.StatusUnauthorized, loginData{
+			renderLogin(ctx, writer, http.StatusUnauthorized, loginData{
 				Error: invalidLoginCredentialsError().Error(),
 			})
 		}

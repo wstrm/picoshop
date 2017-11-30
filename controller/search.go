@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -17,7 +18,7 @@ type searchData struct {
 	Articles []model.Article
 }
 
-func renderSearch(writer http.ResponseWriter, code int, data interface{}) {
+func renderSearch(ctx context.Context, writer http.ResponseWriter, code int, data interface{}) {
 	writer.WriteHeader(code)
 
 	if data == nil {
@@ -29,21 +30,22 @@ func renderSearch(writer http.ResponseWriter, code int, data interface{}) {
 		Data:  data,
 	}
 
-	view.Render(writer, "search", page)
+	view.Render(ctx, writer, "search", page)
 }
 
 func (a *searchHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query().Get("query")
+	ctx := request.Context()
 
 	articles, err := model.SearchForArticles(query)
 	if err != nil {
-		renderSearch(writer, http.StatusInternalServerError, searchData{
+		renderSearch(ctx, writer, http.StatusInternalServerError, searchData{
 			Error: errors.New("Something internal went wrong!").Error(),
 		})
 		return
 	}
 
-	renderSearch(writer, http.StatusOK, searchData{
+	renderSearch(ctx, writer, http.StatusOK, searchData{
 		Articles: articles,
 	})
 	return

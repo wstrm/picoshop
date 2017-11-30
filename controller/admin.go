@@ -15,7 +15,7 @@ type adminData struct {
 }
 
 func (a *adminHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	view.Render(writer, "admin", view.Page{Title: "Admin - Picoshop", Data: adminData{}})
+	view.Render(request.Context(), writer, "admin", view.Page{Title: "Admin - Picoshop", Data: adminData{}})
 }
 
 func newAdminHandler() *adminHandler {

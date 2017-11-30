@@ -1,6 +1,7 @@
 package view
 
 import (
+	"context"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -14,7 +15,12 @@ const (
 var (
 	_, binpath, _, _ = runtime.Caller(0)
 	basepath         = filepath.Dir(binpath)
-	templates        = template.Must(template.ParseGlob(basepath + "/*" + templateExtension))
+	funcs            = template.FuncMap{
+		"context": contextSignature,
+	}
+	templates = template.Must(template.New("picoshop").
+			Funcs(funcs).
+			ParseGlob(basepath + "/*" + templateExtension))
 )
 
 type Page struct {
@@ -23,8 +29,16 @@ type Page struct {
 	Data  interface{}
 }
 
-func Render(writer http.ResponseWriter, template string, page Page) {
-	err := templates.ExecuteTemplate(writer, template+".tmpl.html", page)
+func contextSignature(_ interface{}) interface{} {
+	return nil
+}
+
+func Render(ctx context.Context, writer http.ResponseWriter, tpl string, page Page) {
+	funcs := template.FuncMap{
+		"context": ctx.Value,
+	}
+
+	err := templates.Funcs(funcs).ExecuteTemplate(writer, tpl+".tmpl.html", page)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 	}

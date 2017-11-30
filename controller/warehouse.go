@@ -24,7 +24,7 @@ func (a *warehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 		log.Panicln(err)
 	}
 
-	view.Render(writer, "warehouse", view.Page{Title: "Warehouse - Picoshop", Data: warehouseData{
+	view.Render(request.Context(), writer, "warehouse", view.Page{Title: "Warehouse - Picoshop", Data: warehouseData{
 		Orders: orders,
 	}})
 }

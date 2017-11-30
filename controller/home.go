@@ -18,7 +18,7 @@ func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	view.Render(writer, "home", view.Page{Title: "Picoshop", User: user})
+	view.Render(request.Context(), writer, "home", view.Page{Title: "Picoshop", User: user})
 }
 
 func newHomeHandler() *homeHandler {
