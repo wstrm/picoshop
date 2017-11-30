@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/willeponken/picoshop/middleware/auth"
@@ -67,9 +68,11 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			return
 		}
 
-		if model.ValidPassword(email, password) {
-			err := auth.Login(email, writer, request)
+		if user, ok := model.ValidPassword(email, password); ok {
+			err := auth.Login(user, writer, request)
 			if err != nil {
+				log.Println(err)
+
 				renderLogin(ctx, writer, http.StatusInternalServerError, registerData{
 					Error: internalServerError().Error(),
 				})

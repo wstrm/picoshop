@@ -25,8 +25,8 @@ func New() *http.ServeMux {
 	mux.Handle("/article", auth.Intercept(newArticleHandler()))
 	mux.Handle("/cart", auth.Intercept(newCartHandler()))
 	mux.Handle("/static/", auth.Intercept(newStaticHandler()))
-	mux.Handle("/admin", auth.Protected(newAdminHandler()))
-	mux.Handle("/warehouse", auth.Protected(newWarehouseHandler()))
+	mux.Handle("/admin", auth.Protect(newAdminHandler()))
+	mux.Handle("/warehouse", auth.Protect(newWarehouseHandler()))
 	mux.Handle("/search", auth.Intercept(newSearchHandler()))
 
 	return mux

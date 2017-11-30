@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	hash BINARY(60) NOT NULL,
 	name VARCHAR(255) NOT NULL,
 	phone_number VARCHAR(50),
-	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	addresses INT NULL);
 
 /* Create comments table */
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS comments (
 	id INT NOT NULL,
 	rating DECIMAL(10, 0) NOT NULL, -- rating between 0-10 stars
 	text VARCHAR(255),
-	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
 
 /* Create article table */
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 	address INT NOT NULL,
 	status INT(3) NOT NULL, -- status, future proof with 3 long int
 	articles INT NOT NULL,
-	create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create user_has_orders table */
 CREATE TABLE IF NOT EXISTS customer_has_orders (

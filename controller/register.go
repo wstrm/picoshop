@@ -101,7 +101,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		_, err = model.PutCustomer(model.NewCustomer(email, name, password, phoneNumber))
+		customer, err := model.PutCustomer(model.NewCustomer(email, name, password, phoneNumber))
 		if err != nil {
 			code := getSqlErrorCode(err)
 			var userErr error
@@ -120,7 +120,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		err = auth.Login(email, writer, request)
+		err = auth.Login(customer.User, writer, request)
 		if err != nil {
 			log.Println(err)
 			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{

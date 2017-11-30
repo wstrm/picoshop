@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -29,7 +29,7 @@ type User struct {
 	Id          int64
 	Email       string
 	Name        string
-	Hash        []byte
+	hash        []byte
 	PhoneNumber string
 	CreateTime  time.Time
 	Addresses   int64
@@ -71,7 +71,14 @@ type Article struct {
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
 // Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
 func Open(source string) error {
-	db, err := sql.Open(driver, source)
+	config, err := mysql.ParseDSN(source)
+	if err != nil {
+		return err
+	}
+
+	config.ParseTime = true
+
+	db, err := sql.Open(driver, config.FormatDSN())
 	if err != nil {
 		return err
 	}
@@ -118,10 +125,18 @@ func NewUser(email, name, password, phoneNumber string) User {
 	return User{
 		Email:       email,
 		Name:        name,
-		Hash:        hash,
+		hash:        hash,
 		PhoneNumber: phoneNumber,
 		CreateTime:  now,
 	}
+}
+
+func (user User) IsValid() bool {
+	if user.Email != "" && user.Name != "" && len(user.hash) != 0 && user.PhoneNumber != "" && !user.CreateTime.IsZero() {
+		return true
+	}
+
+	return false
 }
 
 func NewCustomer(email, name, password, phoneNumber string) Customer {
@@ -130,32 +145,31 @@ func NewCustomer(email, name, password, phoneNumber string) Customer {
 	}
 }
 
-func ValidPassword(email, password string) bool {
-	hash, err := getUserHash(email)
+func ValidPassword(email, password string) (user User, ok bool) {
+	user, err := GetUserByEmail(email)
 	if err != nil {
-		return false
+		log.Println(err)
+
+		return
 	}
 
-	err = bcrypt.CompareHashAndPassword(hash, []byte(password))
+	err = bcrypt.CompareHashAndPassword(user.hash, []byte(password))
 	if err != nil {
-		return false
+		return
 	}
 
-	return true
+	ok = true
+	return
 }
 
-func getUserHash(email string) ([]byte, error) {
-	var hash []byte
+func GetUserByEmail(email string) (user User, err error) {
+	err = database.QueryRow(`
+		SELECT email, name, hash, phone_number, create_time
+		FROM user
+		WHERE (email=LOWER(TRIM(?)))
+	`, email).Scan(&user.Email, &user.Name, &user.hash, &user.PhoneNumber, &user.CreateTime)
 
-	err := database.QueryRow(`
-		SELECT (hash) FROM user WHERE (email=LOWER(TRIM(?)))
-	`, email).Scan(&hash)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return hash, nil
+	return
 }
 
 func PutUser(user User) (User, error) {
@@ -164,7 +178,7 @@ func PutUser(user User) (User, error) {
 			(email, 	name, 	hash, 	phone_number, 	create_time)
 			VALUES
 			(LOWER(TRIM(?)), 	?,	?, 	?,		?)
-		`, user.Email, user.Name, user.Hash, user.PhoneNumber, user.CreateTime)
+		`, user.Email, user.Name, user.hash, user.PhoneNumber, user.CreateTime)
 
 	if err != nil {
 		return User{}, err

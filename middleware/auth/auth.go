@@ -2,43 +2,50 @@ package auth
 
 import (
 	"context"
+	"encoding/gob"
 	"errors"
 	"net/http"
 
+	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/session"
 )
 
 const (
 	cookieName = "auth"
+	userKey    = "user"
 )
+
+func init() {
+	gob.Register(model.User{})
+}
 
 func failedToAuthenticateSessionError() error {
 	return errors.New("Failed to authenticate session")
 }
 
-func getEmail(request *http.Request) (string, error) {
+func getUser(request *http.Request) (model.User, error) {
 	s, err := session.Get(request, cookieName)
 	if err != nil {
-		return "", err
+		return model.User{}, err
 	}
 
-	if email, ok := s.Values["email"].(string); ok {
-		return email, nil
+	if user, ok := s.Values[userKey].(model.User); ok {
+		return user, nil
 	}
 
-	return "", nil
+	return model.User{}, nil
 }
 
-func injectEmail(writer http.ResponseWriter, request *http.Request, next http.Handler, protected bool) {
-	email, err := getEmail(request)
+func injectUser(writer http.ResponseWriter, request *http.Request, next http.Handler, protected bool) {
+	user, err := getUser(request)
 	if err != nil {
 		http.Error(writer, failedToAuthenticateSessionError().Error(),
 			http.StatusInternalServerError)
 		return
 	}
 
-	if email != "" {
-		ctx := context.WithValue(request.Context(), "email", email)
+	if !user.IsValid() {
+		ctx := context.WithValue(request.Context(), userKey, user)
 		next.ServeHTTP(writer, request.WithContext(ctx))
 		return
 	} else if protected {
@@ -49,25 +56,25 @@ func injectEmail(writer http.ResponseWriter, request *http.Request, next http.Ha
 	}
 }
 
-func Protected(next http.Handler) http.Handler {
+func Protect(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		injectEmail(writer, request, next, true)
+		injectUser(writer, request, next, true)
 	})
 }
 
 func Intercept(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		injectEmail(writer, request, next, false)
+		injectUser(writer, request, next, false)
 	})
 }
 
-func Login(email string, writer http.ResponseWriter, request *http.Request) error {
+func Login(user model.User, writer http.ResponseWriter, request *http.Request) error {
 	s, err := session.Get(request, cookieName)
 	if err != nil {
 		return err
 	}
 
-	s.Values["email"] = email
+	s.Values[userKey] = user
 	session.Save(request, writer, s)
 
 	return nil
@@ -87,7 +94,7 @@ func Logout(writer http.ResponseWriter, request *http.Request) error {
 
 func IsLoggedIn(request *http.Request) bool {
 	s, _ := session.Get(request, cookieName)
-	if _, ok := s.Values["email"]; ok {
+	if _, ok := s.Values[userKey]; ok {
 		return true
 	}
 
