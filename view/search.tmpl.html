@@ -7,13 +7,14 @@
             <th>Price</th>
             <th></th>
         </tr>
-    {{range $element := .Data.Orders}}
+	{{range $element := .Data.Articles}}
         <tr>
-            <td>{{ $element.Article }}</td>
+            <td>{{ $element.Name }}</td>
             <td>{{ $element.Price }}</td>
-            <td>            </td>
+            <td></td>
         </tr>
-    {{ end }}
+	{{ end }}
     </table>
 </div>
+
 {{ template "footer" }}

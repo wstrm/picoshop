@@ -9,7 +9,7 @@
 
   {{ template "error" .Data.Error }}
 
-  <form action="/login" method="post">
+  <form action="/login" method="post" class="default-form">
     <div>
       <label for="email">E-mail:</label>
       <input type="email" id="email" name="email" value="{{ .Data.Email }}">

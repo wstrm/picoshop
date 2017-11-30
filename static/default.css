@@ -36,7 +36,7 @@ h1, h2, h3, h4, h5 {
 }
 
 /* form */
-form {
+form.default-form {
 	margin: 0 auto;
 	width: 400px;
 	padding: 1em;
@@ -45,28 +45,28 @@ form {
 	box-shadow: 0px 1px 4px #888888;
 }
 
-form div + div {
+form.default-form div + div {
 	margin-top: 1em;
 }
 
-form label {
+form.default-form label {
 	display: inline-block;
 	width: 90px;
 	text-align: right;
 	margin-right: 6px;
 }
 
-form input:focus, textarea:focus {
+form.default-form input:focus, textarea:focus {
 	border-color: #5c8b23;
 }
 
-form input, textarea {
+form.default-form input, textarea {
 	width: 300px;
 	box-sizing: border-box;
 	border: 1px solid #b0ce88;
 }
 
-form button {
+form.default-form button {
 	margin-left: 90px; /* backup for older browsers */
 	margin-left: calc(96px + 0.3em);
 }
@@ -129,6 +129,29 @@ ul.horizontal-navbar {
 	z-index: 2;
 }
 
+form.search {
+	margin: 0 auto;
+	margin-top: 12px;
+	padding: 0.5em;
+	border: 1px solid #b0ce88;
+	background-color: #ebfbd7;
+	box-shadow: 0px 1px 4px #888888;
+}
+
+form.search div + div {
+	margin-top: 1em;
+}
+
+form.search input:focus {
+	border-color: #5c8b23;
+}
+
+form.search input {
+	width: 300px;
+	box-sizing: border-box;
+	border: 1px solid #b0ce88;
+}
+
 ul.horizontal-navbar li {
 	float: left;
 	height: 70px;
@@ -181,7 +204,7 @@ ul.horizontal-navbar li a {
 	margin-top: 2px;
 }
 
-ul.horizontal-navbar li:hover:not(.active) {
+ul.horizontal-navbar li.hover:hover:not(.active) {
 	background-color: #486913;
 }
 
@@ -267,6 +290,7 @@ div.main {
 	padding: 1px 16px;
 }
 
+/* warehouse */
 table.warehouse td {
 	text-align: left;
 }

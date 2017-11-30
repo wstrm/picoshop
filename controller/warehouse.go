@@ -3,9 +3,10 @@ package controller
 import (
 	"net/http"
 
+	"log"
+
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
-	"log"
 )
 
 type warehouseHandler struct {
@@ -18,7 +19,7 @@ type warehouseData struct {
 }
 
 func (a *warehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	orders, err := model.GetOrders()
+	orders, err := model.GetAllOrders()
 	if err != nil {
 		log.Panicln(err)
 	}

@@ -5,15 +5,15 @@
     <form action="/register?type=warehouse" method="post">
         <div>
             <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+            <input type="email" id="email" name="email" value="{{ .Data.Warehouse.Email }}">
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+            <input type="password" id="password" name="password" value="{{ .Data.Warehouse.Password }}">
         </div>
         <div>
             <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.Warehouse.PasswordRetype }}">
         </div>
 
         <div>
@@ -26,15 +26,15 @@
     <form action="/register?type=admin" method="post">
         <div>
             <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+            <input type="email" id="email" name="email" value="{{ .Data.Admin.Email }}">
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+            <input type="password" id="password" name="password" value="{{ .Data.Admin.Password }}">
         </div>
         <div>
             <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.Admin.PasswordRetype }}">
         </div>
 
         <div>
@@ -47,15 +47,15 @@
     <form action="/register?type=customer" method="post">
         <div>
             <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.Email }}">
+            <input type="email" id="email" name="email" value="{{ .Data.User.Email }}">
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.Password }}">
+            <input type="password" id="password" name="password" value="{{ .Data.User.Password }}">
         </div>
         <div>
             <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
+            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.User.PasswordRetype }}">
         </div>
 
         <div>

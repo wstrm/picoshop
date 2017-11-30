@@ -11,7 +11,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/tools/go/gcimporter15/testdata"
 )
 
 // sql.DB is thread-safe
@@ -60,11 +59,14 @@ type Order struct {
 	CreateTime time.Time
 }
 
-type Result struct {
-	Article 	int
-	Price 		int
+type Article struct {
+	Id          int
+	Name        string
+	Description string
+	Price       uint
+	ImageUrl    string
+	Comments    int
 }
-
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
 // Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
@@ -248,19 +250,22 @@ func PutCustomer(customer Customer) (Customer, error) {
 	return customer, nil
 }
 
-func GetOrders() (orders []Order, err error) {
+func GetAllOrders() (orders []Order, err error) {
 	rows, err := database.Query(`
-		SELECT customer, address, articles, status, create_time FROM .order`)
-	defer rows.Close()
-
+		SELECT customer, address, articles, status, create_time
+		FROM .order`)
 	if err != nil {
 		return
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		order := Order{}
 
-		err = rows.Scan(&order.Customer, &order.Address, &order.Articles)
+		err = rows.Scan(
+			&order.Customer, &order.Address, &order.Articles,
+			&order.Status, &order.CreateTime)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -269,38 +274,32 @@ func GetOrders() (orders []Order, err error) {
 	}
 
 	err = rows.Err()
-	if err != nil {
-		return
-	}
-
-
+	return
 }
 
-
-func GetSearchResult(searchingFor string) (results []Result, err error) {
+func SearchForArticles(query string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT name, price FROM .article WHERE name = ?`, searchingFor)
-	defer rows.Close()
-
+		SELECT id, name, description, price, image_url, comments
+		FROM .article WHERE name = ?`, query)
 	if err != nil {
 		return
 	}
 
-	for rows.Next() {
-		result := Result{}
+	defer rows.Close()
 
-		err = rows.Scan(&result.Article, &result.Price)
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description,
+			&article.Price, &article.ImageUrl, &article.Comments)
 		if err != nil {
 			log.Panicln(err)
 		}
 
-		results = append(results, result)
+		articles = append(articles, article)
 	}
 
 	err = rows.Err()
-	if err != nil {
-		return
-	}
-
-
+	return
 }
