@@ -18,6 +18,7 @@
                 </form>
             </td>
         </tr>
+    {{ end }}
         <tr>
             <form action="/cart" method="PUT">
                 <input> type="Credit card number" id="Credit card number" name"Credit card number" value="{{ .Data.Cart.Number }}">
@@ -27,7 +28,6 @@
                 <button type="submit">PLACE ORDER</button>
             </form>
         </tr>
-    {{ end }}
     </table>
 </div>
 {{ template "footer" }}
