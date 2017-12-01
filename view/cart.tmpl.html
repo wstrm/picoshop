@@ -21,10 +21,10 @@
     {{ end }}
         <tr>
             <form action="/cart" method="PUT">
-                <input> type="Credit card number" id="Credit card number" name"Credit card number" value="{{ .Data.Cart.Number }}">
-                <input> type="Expiration date" id="Expiration date" name"Expiration date" value="{{ .Data.Cart.Expiration }}">
-                <input> type="CVC" id="CVC" name"CVC" value="{{ .Data.Cart.Cvc }}"
-                <input> type="Card holder" id="Cardholder" name"Card holder" value="{{ .Data.Cart.CardHolder }}"
+                <input type="Credit card number" id="Credit card number" name="Credit card number" value="{{ .Data.Cart.Number }}">
+                <input type="Expiration date" id="Expiration date" name="Expiration date" value="{{ .Data.Cart.Expiration }}">
+                <input type="CVC" id="CVC" name="CVC" value="{{ .Data.Cart.Cvc }}">
+                <input type="Card holder" id="Cardholder" name="Card holder" value="{{ .Data.Cart.CardHolder }}">
                 <button type="submit">PLACE ORDER</button>
             </form>
         </tr>
