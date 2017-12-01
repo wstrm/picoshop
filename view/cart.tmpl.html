@@ -8,17 +8,20 @@
             <th>Price</th>
             <th></th>
         </tr>
-    {{range $element := .Data.Cart}}
+    {{range $element, $pos := .Data.Cart}}
         <tr>
             <td>{{ $element.Article }}</td>
             <td>{{ $element.Price }}</td>
             <td>
-                <form action="/cart">
+                <form action="/cart?{{ $pos }}" method="DELETE">
                     <button type="submit">REMOVE</button>
                 </form>
             </td>
         </tr>
     {{ end }}
+        <form action="/cart" method="DELETE">
+            <button type="submit">EMPTY CART</button>
+        </form>
         <tr>
             <form action="/cart" method="PUT">
                 <input type="Credit card number" id="Credit card number" name="Credit card number" value="{{ .Data.Cart.Number }}">
