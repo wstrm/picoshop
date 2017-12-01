@@ -67,20 +67,16 @@
 <h3>Add article</h3>
     <form action="/article" method="post" enctype="multipart/form-data">
         <div>
-            <label for="article to modify">Article:</label>
-            <input type="article to modify" id="article to modify" name="article to modify" value="{{ .Data.Article.Name }}">
+            <label for="article">Article:</label>
+            <input type="article" id="article" name="article" value="{{ .Data.Article.Name }}">
         </div>
         <div>
-            <label for="new name">Name:</label>
-            <input type="new name" id="new name" name="new name" value="{{ .Data.Article.NewName }}">
+            <label for="price">Price:</label>
+            <input type="price" id="price" name="price" value="{{ .Data.Article.Price }}">
         </div>
         <div>
-            <label for="new price">Price:</label>
-            <input> type="new price" id="new price" name"new name" value="{{ .Data.Article.NewPrice }}"> 
-        </div>
-        <div>
-            <label for="new image">Choose file to upload</label>
-        <input type="new image" id="new image" name="new image" multiple>
+            <label for="file">Choose file to upload</label>
+        <input type="file" id="file" name="file" multiple>
 
         </div>
 
@@ -88,6 +84,33 @@
             <button type="submit">Register</button>
         </div>
     </form>
+</div>
+
+
+<h3>Add article</h3>
+<form action="/article" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="article to modify">Article:</label>
+        <input type="article to modify" id="article to modify" name="article to modify" value="{{ .Data.Article.Name }}">
+    </div>
+    <div>
+        <label for="new name">Name:</label>
+        <input type="new name" id="new name" name="new name" value="{{ .Data.Article.NewName }}">
+    </div>
+    <div>
+        <label for="new price">Price:</label>
+        <input> type="new price" id="new price" name"new name" value="{{ .Data.Article.NewPrice }}">
+    </div>
+    <div>
+        <label for="new image">Choose file to upload</label>
+        <input type="new image" id="new image" name="new image" multiple>
+
+    </div>
+
+    <div>
+        <button type="submit">Register</button>
+    </div>
+</form>
 </div>
 
 
