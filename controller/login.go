@@ -13,6 +13,7 @@ import (
 
 type loginHandler struct {
 	http.Handler
+	authManager *auth.Manager
 }
 
 type loginData struct {
@@ -69,7 +70,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		}
 
 		if user, ok := model.ValidPassword(email, password); ok {
-			err := auth.Login(user, writer, request)
+			err := l.authManager.Login(user, writer, request)
 			if err != nil {
 				log.Println(err)
 
@@ -90,6 +91,8 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	}
 }
 
-func newLoginHandler() *loginHandler {
-	return &loginHandler{}
+func newLoginHandler(authManager *auth.Manager) *loginHandler {
+	return &loginHandler{
+		authManager: authManager,
+	}
 }

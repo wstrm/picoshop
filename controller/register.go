@@ -14,6 +14,7 @@ import (
 
 type registerHandler struct {
 	http.Handler
+	authManager *auth.Manager
 }
 
 type registerData struct {
@@ -120,7 +121,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		err = auth.Login(customer.User, writer, request)
+		err = r.authManager.Login(customer.User, writer, request)
 		if err != nil {
 			log.Println(err)
 			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
@@ -132,6 +133,8 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 	}
 }
 
-func newRegisterHandler() *registerHandler {
-	return &registerHandler{}
+func newRegisterHandler(authManager *auth.Manager) *registerHandler {
+	return &registerHandler{
+		authManager: authManager,
+	}
 }
