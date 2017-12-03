@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"errors"
+	"log"
 	"net/http"
 	"reflect"
 
@@ -128,7 +129,14 @@ func (manager *Manager) Login(user User, writer http.ResponseWriter, request *ht
 		delete(s.Values, supportedUser) // in Go, delete(m, k) is no-op if key does not exist in map
 	}
 
+	log.Printf("Settings cookie for user %v", user)
+
+	// TODO(willeponken): This wont work currently because the controllers will send
+	// a model.User struct, which wont be save because it has not been registered
+	// by NewManager to encoding/gob.
 	s.Values[getUserKey(user)] = user
+
+	log.Printf("Current sessions: %v", s.Values)
 	session.Save(request, writer, s)
 
 	return nil
@@ -165,5 +173,6 @@ func failedToAuthenticateSessionError() error {
 }
 
 func getUserKey(user User) userKey {
+	log.Println(reflect.TypeOf(user).Name())
 	return userKey(reflect.TypeOf(user).Name())
 }

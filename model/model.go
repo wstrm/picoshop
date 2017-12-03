@@ -145,6 +145,9 @@ func NewCustomer(email, name, password, phoneNumber string) Customer {
 	}
 }
 
+// TODO(willeponken): Find out how to authenticate Admin, Customer and Warehouse
+// together (use a interface?). And also make sure this interface holds all data
+// so that it can be identified correctly by middleware/auth.
 func ValidPassword(email, password string) (user User, ok bool) {
 	user, err := GetUserByEmail(email)
 	if err != nil {
