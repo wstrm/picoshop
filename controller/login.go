@@ -75,11 +75,11 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			ok   bool
 		)
 		switch userType {
-		case "Admin":
+		case "admin":
 			user, ok = model.AuthenticateAdminByEmail(email, password)
-		case "Customer":
+		case "customer":
 			user, ok = model.AuthenticateCustomerByEmail(email, password)
-		case "Warehouse":
+		case "warehouse":
 			user, ok = model.AuthenticateWarehouseByEmail(email, password)
 		default:
 			renderLogin(ctx, writer, http.StatusBadRequest, loginData{

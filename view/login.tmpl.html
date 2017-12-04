@@ -1,36 +1,35 @@
 {{ template "header" . }}
 
 <div class="smallbox">
-  <h1>Login :D</h1>
+	<h1>Login :D</h1>
 
-  <p>
-  Welcome back!
-  </p>
+	<p>
+	Welcome back!
+	</p>
 
-  {{ template "error" .Data.Error }}
+	{{ template "error" .Data.Error }}
 
-  <form action="/login" method="post" class="default-form">
-    <select name="type">
-        <option value="Customer">Customer</option>
-        <option value="Warehouse">Warehouse</option>
-        <option value="Admin">Admin</option>
-    </select>
-      <div>
-      <label for="email">E-mail:</label>
-      <input type="email" id="email" name="email" value="{{ .Data.Email }}">
-    </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" value="{{ .Data.Password }}">
-    </div>
-    <div>
-	    <input name="type" value="Customer">
-    </div>
+	<form action="/login" method="post" class="default-form">
+		<div>
+			<label for="email">E-mail:</label>
+			<input type="email" id="email" name="email" value="{{ .Data.Email }}">
+		</div>
+		<div>
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" value="{{ .Data.Password }}">
+		</div>
+		<div>
+		</div>
 
-    <div>
-      <button type="submit">Login</button>
-    </div>
-  </form>
+		<div>
+			<button type="submit">Login</button> as 
+			<select name="type">
+				<option value="customer">Customer</option>
+				<option value="warehouse">Warehouse</option>
+				<option value="admin">Admin</option>
+			</select>
+		</div>
+	</form>
 </div>
 
 {{ template "footer" }}
