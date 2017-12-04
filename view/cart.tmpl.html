@@ -1,6 +1,36 @@
 {{ template "header" . }}
 
 <h1>Picoshop</h1>
-<p>Welcome to Picoshop!</p>
-
+<div class = "midbox">
+    <table class="cart">
+        <tr>
+            <th>Articles</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    {{range $element, $pos := .Data.Cart}}
+        <tr>
+            <td>{{ $element.Article }}</td>
+            <td>{{ $element.Price }}</td>
+            <td>
+                <form action="/cart?{{ $pos }}" method="DELETE">
+                    <button type="submit">REMOVE</button>
+                </form>
+            </td>
+        </tr>
+    {{ end }}
+        <form action="/cart" method="DELETE">
+            <button type="submit">EMPTY CART</button>
+        </form>
+        <tr>
+            <form action="/cart" method="PUT">
+                <input type="Credit card number" id="Credit card number" name="Credit card number" value="{{ .Data.Cart.Number }}">
+                <input type="Expiration date" id="Expiration date" name="Expiration date" value="{{ .Data.Cart.Expiration }}">
+                <input type="CVC" id="CVC" name="CVC" value="{{ .Data.Cart.Cvc }}">
+                <input type="Card holder" id="Cardholder" name="Card holder" value="{{ .Data.Cart.CardHolder }}">
+                <button type="submit">PLACE ORDER</button>
+            </form>
+        </tr>
+    </table>
+</div>
 {{ template "footer" }}

@@ -1,6 +1,17 @@
 {{ template "header" . }}
 
 <h1>Picoshop</h1>
-<p>Welcome to Picoshop!</p>
+<p>Welcome to your profile!</p>
+        <div class="midbox">
+            <table>
+                <form action="/user">
+                    <input type="Name" id="Name" name="Name" value="{{ .Data.User.Name }}">
+                    <input type="E-mail" id="E-mail" name="E-mail" value="{{ .Data.User.Email }}">
+                    <input type="Phone number" id="Phone number" name="Phone number" value="{{ .Data.User.PhoneNumber }}" >
+                    <button type="submit">UPDATE</button>
+                </form>
+                <input type="Created" id="Created" name="Created" value="{{ .Data.User.CreateTime }}">
+            </table>
+        </div>
 
 {{ template "footer" }}

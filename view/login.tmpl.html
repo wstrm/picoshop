@@ -10,7 +10,12 @@
   {{ template "error" .Data.Error }}
 
   <form action="/login" method="post" class="default-form">
-    <div>
+    <select name="type">
+        <option value="Customer">Customer</option>
+        <option value="Warehouse">Warehouse</option>
+        <option value="Admin">Admin</option>
+    </select>
+      <div>
       <label for="email">E-mail:</label>
       <input type="email" id="email" name="email" value="{{ .Data.Email }}">
     </div>

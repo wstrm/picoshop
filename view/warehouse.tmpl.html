@@ -14,7 +14,10 @@
                  <td>{{ $element.OrderArticles }}</td>
                  <td>{{ $element.Address }}</td>
                  <td>
-                     <form action="/order">
+                     <form action="/order?id={{ $element.Id }}" method="PUT">
+                         <button type="submit">ACCEPT ORDER</button>
+                     </form>
+                     <form action="/order?id={{ $element.Id }}" method="DELETE">
                         <button type="submit">END ORDER</button>
                      </form>
                  </td>

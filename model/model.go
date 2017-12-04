@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"os/user"
 )
 
 // sql.DB is thread-safe
@@ -378,4 +379,13 @@ func SearchForArticles(query string) (articles []Article, err error) {
 
 	err = rows.Err()
 	return
+}
+
+func putArticle(article Article)(err error){
+	_, err = database.Exec(`
+	INSERT INTO .article (Name, Description, Price, ImageUrl)
+	VALUES ( ?, ?, ?, ?)`, &article.Name, &article.Description, &article.Price, &article.ImageUrl)
+	if err != nil{
+		return
+	}
 }
