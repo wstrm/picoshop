@@ -1,6 +1,28 @@
 {{ template "header" . }}
 
-<h1>Picoshop - Article</h1>
-<p>Article: {{ .Data }} was requested.</p>
+<div class = "midbox">
+    <table class="article">
+        <tr>
+            <th>Article</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    {{range $element := .Data.Article }}
+        <tr>
+            <td>{{ $element.Image }}</td>
+            <td>{{ $element.Name }}</td>
+            <td>{{ $element.Price }}</td>
+            <td></td>
+        </tr>
 
+        <tr>
+            <td>{{ $element.Comments}}</td>
+        </tr>
+    {{ end }}
+        <form action="/article" method="PUT">
+            <input type="comment" id="comment" name="comment" value="{{ .Data.Article.Comment }}">
+            <button type="submit">COMMENT</button>
+        </form>
+    </table>
+</div>
 {{ template "footer" }}
