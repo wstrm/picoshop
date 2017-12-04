@@ -59,6 +59,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 
 		email := request.PostFormValue("email")
 		password := request.PostFormValue("password")
+		userType := request.PostFormValue("type")
 
 		if err := IsFilled(email, password); err != nil {
 			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
@@ -69,7 +70,25 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			return
 		}
 
-		if user, ok := model.ValidPassword(email, password); ok {
+		var (
+			user auth.User
+			ok   bool
+		)
+		switch userType {
+		case "Admin":
+			user, ok = model.AuthenticateAdminByEmail(email, password)
+		case "Customer":
+			user, ok = model.AuthenticateCustomerByEmail(email, password)
+		case "Warehouse":
+			user, ok = model.AuthenticateWarehouseByEmail(email, password)
+		default:
+			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
+				Error: errors.New("Missing user type field").Error(),
+			})
+			return
+		}
+
+		if ok {
 			err := l.authManager.Login(user, writer, request)
 			if err != nil {
 				log.Println(err)

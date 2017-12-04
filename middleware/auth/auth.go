@@ -11,8 +11,6 @@ import (
 	"github.com/willeponken/picoshop/session"
 )
 
-type userKey string
-
 type User interface {
 	IsValid() bool
 }
@@ -20,11 +18,11 @@ type User interface {
 type Manager struct {
 	cookieName string
 	// TODO(willeponken): benchmark vs. something like map[userKey]bool
-	supportedUsers []userKey // short array - should be faster than hash map (?)
+	supportedUsers []string // short array - should be faster than hash map (?)
 }
 
 type Policy struct {
-	authorization map[userKey]bool
+	authorization map[string]bool
 	protected     bool
 }
 
@@ -36,7 +34,7 @@ func (policy Policy) SetUser(user User, authorize bool) {
 	policy.protected = true
 
 	if policy.authorization == nil {
-		policy.authorization = make(map[userKey]bool)
+		policy.authorization = make(map[string]bool)
 	}
 	policy.authorization[getUserKey(user)] = authorize
 }
@@ -48,7 +46,7 @@ func (policy Policy) SetProtected(protected bool) {
 	policy.protected = protected
 }
 
-func (policy Policy) isAllowed(key userKey) bool {
+func (policy Policy) isAllowed(key string) bool {
 	if !policy.protected {
 		return true // unprotected
 	}
@@ -61,7 +59,7 @@ func (policy Policy) isAllowed(key userKey) bool {
 }
 
 func NewManager(cookieName string, userInterfaces ...User) *Manager {
-	var supportedUsers []userKey
+	var supportedUsers []string
 
 	for _, userInterface := range userInterfaces {
 		gob.Register(userInterface)                                        // will panic if registered multiple managers with same user interface
@@ -129,11 +127,7 @@ func (manager *Manager) Login(user User, writer http.ResponseWriter, request *ht
 		delete(s.Values, supportedUser) // in Go, delete(m, k) is no-op if key does not exist in map
 	}
 
-	log.Printf("Settings cookie for user %v", user)
-
-	// TODO(willeponken): This wont work currently because the controllers will send
-	// a model.User struct, which wont be save because it has not been registered
-	// by NewManager to encoding/gob.
+	log.Printf("Setting cookie for user %v", user)
 	s.Values[getUserKey(user)] = user
 
 	log.Printf("Current sessions: %v", s.Values)
@@ -172,7 +166,6 @@ func failedToAuthenticateSessionError() error {
 	return errors.New("Failed to authenticate session")
 }
 
-func getUserKey(user User) userKey {
-	log.Println(reflect.TypeOf(user).Name())
-	return userKey(reflect.TypeOf(user).Name())
+func getUserKey(user User) string {
+	return reflect.TypeOf(user).Name()
 }

@@ -145,23 +145,82 @@ func NewCustomer(email, name, password, phoneNumber string) Customer {
 	}
 }
 
-// TODO(willeponken): Find out how to authenticate Admin, Customer and Warehouse
-// together (use a interface?). And also make sure this interface holds all data
-// so that it can be identified correctly by middleware/auth.
-func ValidPassword(email, password string) (user User, ok bool) {
-	user, err := GetUserByEmail(email)
-	if err != nil {
-		log.Println(err)
-
-		return
-	}
-
-	err = bcrypt.CompareHashAndPassword(user.hash, []byte(password))
+func validPassword(hash []byte, password string) (ok bool) {
+	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	if err != nil {
 		return
 	}
 
 	ok = true
+	return
+}
+
+func AuthenticateAdminByEmail(email string, password string) (admin Admin, ok bool) {
+	admin, err := GetAdminByEmail(email)
+	if err != nil {
+		ok = false
+		return
+	}
+
+	ok = validPassword(admin.hash, password)
+	return
+}
+
+func AuthenticateCustomerByEmail(email string, password string) (customer Customer, ok bool) {
+	customer, err := GetCustomerByEmail(email)
+	if err != nil {
+		ok = false
+		return
+	}
+
+	ok = validPassword(customer.hash, password)
+	return
+}
+
+func AuthenticateWarehouseByEmail(email string, password string) (warehouse Warehouse, ok bool) {
+	warehouse, err := GetWarehouseByEmail(email)
+	if err != nil {
+		ok = false
+		return
+	}
+
+	ok = validPassword(warehouse.hash, password)
+	return
+}
+
+func GetAdminByEmail(email string) (admin Admin, err error) {
+	err = database.QueryRow(`
+		SELECT admin.id, user.id, user.email, user.name, user.hash, user.phone_number, user.create_time
+		FROM user
+		INNER JOIN admin
+		ON user.id = admin.user
+		WHERE user.email=LOWER(TRIM(?))
+	`, email).Scan(&admin.Id, &admin.User.Id, &admin.User.Email, &admin.User.Name, &admin.User.hash, &admin.User.PhoneNumber, &admin.User.CreateTime)
+
+	return
+}
+
+func GetCustomerByEmail(email string) (customer Customer, err error) {
+	err = database.QueryRow(`
+		SELECT customer.id, user.id, user.email, user.name, user.hash, user.phone_number, user.create_time
+		FROM user
+		INNER JOIN customer
+		ON user.id = customer.user
+		WHERE user.email=LOWER(TRIM(?))
+	`, email).Scan(&customer.Id, &customer.User.Id, &customer.User.Email, &customer.User.Name, &customer.User.hash, &customer.User.PhoneNumber, &customer.User.CreateTime)
+
+	return
+}
+
+func GetWarehouseByEmail(email string) (warehouse Warehouse, err error) {
+	err = database.QueryRow(`
+		SELECT warehouse.id, user.id, user.email, user.name, user.hash, user.phone_number, user.create_time
+		FROM user
+		INNER JOIN warehouse
+		ON user.id = warehouse.user
+		WHERE user.email=LOWER(TRIM(?))
+	`, email).Scan(&warehouse.Id, &warehouse.User.Id, &warehouse.User.Email, &warehouse.User.Name, &warehouse.User.hash, &warehouse.User.PhoneNumber, &warehouse.User.CreateTime)
+
 	return
 }
 
