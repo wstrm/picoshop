@@ -90,20 +90,20 @@
 <h3>Add article</h3>
 <form action="/article" method="post" enctype="multipart/form-data">
     <div>
-        <label for="article to modify">Article:</label>
-        <input type="article to modify" id="article to modify" name="article to modify" value="{{ .Data.Article.Name }}">
+        <label for="name">Name:</label>
+        <input type="name" id="name" name="name" value="{{ .Data.Article.Name }}">
     </div>
     <div>
-        <label for="new name">Name:</label>
-        <input type="new name" id="new name" name="new name" value="{{ .Data.Article.NewName }}">
+        <label for="description" >Description:</label>
+        <input type="description" id="description" name="description" value="{{ .Data.Article.Description}}">
     </div>
     <div>
-        <label for="new price">Price:</label>
-        <input> type="new price" id="new price" name"new name" value="{{ .Data.Article.NewPrice }}">
+        <label for="price">Price:</label>
+        <input> type="price" id="price" name"name" value="{{ .Data.Article.Price }}">
     </div>
     <div>
-        <label for="new image">Choose file to upload</label>
-        <input type="new image" id="new image" name="new image" multiple>
+        <label for="image">Choose file to upload</label>
+        <input type="image" id="image" name="image" value="{{ .Data.Article.ImageUrl }}">
 
     </div>
 
