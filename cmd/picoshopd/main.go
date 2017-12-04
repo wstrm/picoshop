@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -25,6 +26,8 @@ var context = flags{
 	tls:     false,
 }
 
+var version = "0.0.1"
+
 func init() {
 	flag.StringVar(&context.address, "address", context.address, "Listen address for web server")
 	flag.StringVar(&context.source, "source", context.source, "Database connection source")
@@ -32,6 +35,11 @@ func init() {
 	flag.StringVar(&context.key, "key", context.key, "Key for TLS")
 	flag.BoolVar(&context.tls, "tls", context.tls, "Listen using TLS, requires the -cert and -key flags")
 	flag.Parse()
+
+	// Log line file:linenumber.
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	// Prefix log output with "[show (<version>)]".
+	log.SetPrefix(fmt.Sprintf("[\033[32m%s\033[0m (%s)] ", "picoshopd", version))
 
 	if context.source == "" {
 		log.Fatalln("Please define a MySQL source, example: -source user:password@tcp(127.0.0.1:3306)/picoshop")

@@ -132,7 +132,7 @@ func NewUser(email, name, password, phoneNumber string) User {
 }
 
 func (user User) IsValid() bool {
-	if user.Email != "" && user.Name != "" && len(user.hash) != 0 && user.PhoneNumber != "" && !user.CreateTime.IsZero() {
+	if user.Email != "" && user.Name != "" && user.PhoneNumber != "" && !user.CreateTime.IsZero() {
 		return true
 	}
 

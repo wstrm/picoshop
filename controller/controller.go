@@ -73,6 +73,7 @@ func New() *http.ServeMux {
 
 	mux.Handle("/", a.Middleware(newHomeHandler(), openPolicy))
 	mux.Handle("/login", a.Middleware(newLoginHandler(a), openPolicy))
+	mux.Handle("/logout", a.Middleware(newLogoutHandler(a), openPolicy))
 	mux.Handle("/register", a.Middleware(newRegisterHandler(a), openPolicy))
 	mux.Handle("/user", a.Middleware(newUserHandler(), userPolicy))
 	mux.Handle("/article", a.Middleware(newArticleHandler(), openPolicy))

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/gob"
 	"errors"
-	"log"
 	"net/http"
 	"reflect"
 
@@ -78,7 +77,7 @@ func (manager *Manager) getUser(request *http.Request) (user User, err error) {
 		return
 	}
 
-	for supportedUser := range manager.supportedUsers {
+	for _, supportedUser := range manager.supportedUsers {
 		if u, ok := s.Values[supportedUser].(User); ok {
 			// return first found user in session. Several users should never exist
 			// and the Manager.Login method should make sure to empty old users before
@@ -118,19 +117,13 @@ func (manager *Manager) Middleware(next http.Handler, policy Policy) http.Handle
 }
 
 func (manager *Manager) Login(user User, writer http.ResponseWriter, request *http.Request) error {
-	s, err := session.Get(request, manager.cookieName)
-	if err != nil {
-		return err
-	}
+	s, _ := session.Get(request, manager.cookieName) // ignore errors, if it occurs the values will be overwritten anyhow
 
 	for supportedUser := range manager.supportedUsers {
 		delete(s.Values, supportedUser) // in Go, delete(m, k) is no-op if key does not exist in map
 	}
 
-	log.Printf("Setting cookie for user %v", user)
 	s.Values[getUserKey(user)] = user
-
-	log.Printf("Current sessions: %v", s.Values)
 	session.Save(request, writer, s)
 
 	return nil
@@ -142,14 +135,16 @@ func (manager *Manager) Logout(writer http.ResponseWriter, request *http.Request
 		return err
 	}
 
-	s.Options.MaxAge = -1 // invalidate session - web browser will remove all entries
-	session.Save(request, writer, s)
+	session.Invalidate(request, writer, s)
 
 	return nil
 }
 
 func (manager *Manager) IsLoggedIn(request *http.Request) bool {
-	s, _ := session.Get(request, manager.cookieName)
+	s, err := session.Get(request, manager.cookieName)
+	if err != nil {
+		return false
+	}
 
 	// iterate over all keys in session to find 'any' registered user (should at most
 	// be one due to Manager.Login)

@@ -18,10 +18,10 @@
 				</a>
 			</li>
 
-			{{ $user := context "user" }}
-			{{ if $user.Name }}
+			{{ $customer := context "Customer" }}
+			{{ if $customer.Name }}
 				<li class="right hover"><a href="/logout">Logout</a></li>
-				<li class="right"><a href="/user">Welcome {{ $user.Name }}!</a></li>
+				<li class="right"><a href="/user">Welcome {{ $customer.Name }}!</a></li>
 			{{ else }}
 				<li class="right hover"><a href="/login">Login</a></li>
 				<li class="right hover"><a href="/register">Register</a></li>
