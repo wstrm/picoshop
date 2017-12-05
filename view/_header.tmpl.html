@@ -1,4 +1,9 @@
 {{ define "header" }}
+
+{{ $customer := context "Customer" }}
+{{ $admin := context "Admin" }}
+{{ $warehouse := context "Warehouse" }}
+
 <html>
 	<head>
 		<meta charset="UTF-8">
@@ -18,13 +23,12 @@
 				</a>
 			</li>
 
-			{{ $customer := context "Customer" }}
-			{{ if $customer.Name }}
-				<li class="right hover"><a href="/logout">Logout</a></li>
-				<li class="right"><a href="/user">Welcome {{ $customer.Name }}!</a></li>
+			{{ with (or (or $customer $admin) $warehouse) }}
+			<li class="right hover"><a href="/logout">Logout</a></li>
+			<li class="right"><a href="/user">Welcome {{ .Name }}!</a></li>
 			{{ else }}
-				<li class="right hover"><a href="/login">Login</a></li>
-				<li class="right hover"><a href="/register">Register</a></li>
+			<li class="right hover"><a href="/login">Login</a></li>
+			<li class="right hover"><a href="/register">Register</a></li>
 			{{ end }}
 
 			<li class="right">
@@ -46,6 +50,13 @@
 			<li><a href="#">Dessert</a></li>
 			<li><a class="bestseller" href="#">Spork</a></li>
 			<li><a href="#">Couteau de Picleu</a></li>
+			{{ if $admin }}
+			<li class="category"><a href="#">Admin</a></li>
+			<li><a href="/admin">Panel</a></li>
+			{{ else if $warehouse }}
+			<li class="category"><a href="#">Warehouse</a></li>
+			<li><a href="/warehouse">Panel</a></li>
+			{{ end }}
 		</ul>
 
 		<div class="main">

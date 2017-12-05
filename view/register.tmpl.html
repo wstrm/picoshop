@@ -7,33 +7,7 @@
   O hai! Register today for fast checkouts and great offers.
   </p>
 
-  {{ template "error" .Data.Error }}
-
-  <form action="/register" method="post" class="default-form">
-    <div>
-      <label for="email">E-mail:</label>
-      <input type="email" id="email" name="email" value="{{ .Data.Email }}">
-    </div>
-    <div>
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" value="{{ .Data.Name }}">
-    </div>
-    <div>
-      <label for="phone-number">Phone number:</label>
-      <input type="tel" id="phone-number" name="phone-number" value="{{ .Data.PhoneNumber }}">
-    </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" value="{{ .Data.Password }}">
-    </div>
-    <div>
-      <label for="password-retype">Re-type password:</label>
-      <input type="password" id="password-retype" name="password-retype" value="{{ .Data.PasswordRetype }}">
-    </div>
-    <div>
-      <button type="submit">Register</button>
-    </div>
-  </form>
+  {{ template "register-form" .Data }}
 
   <p>
   <small>

@@ -1,4 +1,4 @@
-package controller
+package home
 
 import (
 	"net/http"
@@ -19,6 +19,6 @@ func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	view.Render(request.Context(), writer, "home", view.Page{Title: "Picoshop"})
 }
 
-func newHomeHandler() *homeHandler {
+func NewHandler() *homeHandler {
 	return &homeHandler{}
 }

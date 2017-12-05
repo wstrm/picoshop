@@ -1,4 +1,4 @@
-package controller
+package warehouse
 
 import (
 	"net/http"
@@ -29,6 +29,6 @@ func (a *warehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 	}})
 }
 
-func newWarehouseHandler() *warehouseHandler {
+func NewHandler() *warehouseHandler {
 	return &warehouseHandler{}
 }

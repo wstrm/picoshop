@@ -1,4 +1,4 @@
-package controller
+package login
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/willeponken/picoshop/controller/helper"
 	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
@@ -52,7 +53,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		err := request.ParseForm()
 		if err != nil {
 			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
-				Error: invalidFormDataError().Error(),
+				Error: helper.InvalidFormDataError().Error(),
 			})
 			return
 		}
@@ -61,7 +62,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		password := request.PostFormValue("password")
 		userType := request.PostFormValue("type")
 
-		if err := IsFilled(email, password); err != nil {
+		if err := helper.IsFilled(email, password); err != nil {
 			renderLogin(ctx, writer, http.StatusBadRequest, loginData{
 				Error:    err.Error(),
 				Email:    email,
@@ -93,8 +94,8 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			if err != nil {
 				log.Println(err)
 
-				renderLogin(ctx, writer, http.StatusInternalServerError, registerData{
-					Error: internalServerError().Error(),
+				renderLogin(ctx, writer, http.StatusInternalServerError, loginData{
+					Error: helper.InternalServerError().Error(),
 				})
 			}
 
@@ -110,7 +111,7 @@ func (l *loginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	}
 }
 
-func newLoginHandler(authManager *auth.Manager) *loginHandler {
+func NewHandler(authManager *auth.Manager) *loginHandler {
 	return &loginHandler{
 		authManager: authManager,
 	}

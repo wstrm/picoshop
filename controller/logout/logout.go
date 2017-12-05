@@ -1,4 +1,4 @@
-package controller
+package logout
 
 import (
 	"net/http"
@@ -17,7 +17,7 @@ func (l *logoutHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	http.Redirect(writer, request, "/", http.StatusSeeOther)
 }
 
-func newLogoutHandler(authManager *auth.Manager) *logoutHandler {
+func NewHandler(authManager *auth.Manager) *logoutHandler {
 	return &logoutHandler{
 		authManager: authManager,
 	}

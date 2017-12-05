@@ -1,118 +1,62 @@
 {{ template "header" . }}
 
 <div class = "midbox">
-    <h3>Warehouse</h3>
-    <form action="/register?type=warehouse" method="post">
-        <div>
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.Warehouse.Email }}">
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.Warehouse.Password }}">
-        </div>
-        <div>
-            <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.Warehouse.PasswordRetype }}">
-        </div>
+	<h3>Administration panel</h3>
 
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
+	<h4>Register new user</h4>
+	<ul>
+		<li><a href="/register?admin">Admin</a></li>
+		<li><a href="/register?customer">Customer</a></li>
+		<li><a href="/register?warehouse">Warehouse</a></li>
+	</ul>
 
+	<h3>Add article</h3>
+	<form action="/article" method="post" enctype="multipart/form-data">
+		<div>
+			<label for="article">Article:</label>
+			<input type="article" id="article" name="article" value="{{ .Data.Article.Name }}">
+		</div>
+		<div>
+			<label for="price">Price:</label>
+			<input type="price" id="price" name="price" value="{{ .Data.Article.Price }}">
+		</div>
+		<div>
+			<label for="file">Choose file to upload</label>
+			<input type="file" id="file" name="file" multiple>
 
-    <h3>Admin</h3>
-    <form action="/register?type=admin" method="post">
-        <div>
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.Admin.Email }}">
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.Admin.Password }}">
-        </div>
-        <div>
-            <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.Admin.PasswordRetype }}">
-        </div>
+		</div>
 
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
+		<div>
+			<button type="submit">Register</button>
+		</div>
+	</form>
 
 
-    <h3>User</h3>
-    <form action="/register?type=customer" method="post">
-        <div>
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" value="{{ .Data.User.Email }}">
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="{{ .Data.User.Password }}">
-        </div>
-        <div>
-            <label for="password-retype">Re-type password:</label>
-            <input type="password" id="password-retype" name="password-retype" value="{{ .Data.User.PasswordRetype }}">
-        </div>
+	<h3>Add article</h3>
+	<form action="/article" method="post" enctype="multipart/form-data">
+		<div>
+			<label for="name">Name:</label>
+			<input type="name" id="name" name="name" value="{{ .Data.Article.Name }}">
+		</div>
+		<div>
+			<label for="description" >Description:</label>
+			<input type="description" id="description" name="description" value="{{ .Data.Article.Description}}">
+		</div>
+		<div>
+			<label for="price">Price:</label>
+			<input> type="price" id="price" name"name" value="{{ .Data.Article.Price }}">
+		</div>
+		<div>
+			<label for="image">Choose file to upload</label>
+			<input type="image" id="image" name="image" value="{{ .Data.Article.ImageUrl }}">
 
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
+		</div>
+
+		<div>
+			<button type="submit">Register</button>
+		</div>
+	</form>
 </div>
-
-<h3>Add article</h3>
-    <form action="/article" method="post" enctype="multipart/form-data">
-        <div>
-            <label for="article">Article:</label>
-            <input type="article" id="article" name="article" value="{{ .Data.Article.Name }}">
-        </div>
-        <div>
-            <label for="price">Price:</label>
-            <input type="price" id="price" name="price" value="{{ .Data.Article.Price }}">
-        </div>
-        <div>
-            <label for="file">Choose file to upload</label>
-        <input type="file" id="file" name="file" multiple>
-
-        </div>
-
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
 </div>
-
-
-<h3>Add article</h3>
-<form action="/article" method="post" enctype="multipart/form-data">
-    <div>
-        <label for="name">Name:</label>
-        <input type="name" id="name" name="name" value="{{ .Data.Article.Name }}">
-    </div>
-    <div>
-        <label for="description" >Description:</label>
-        <input type="description" id="description" name="description" value="{{ .Data.Article.Description}}">
-    </div>
-    <div>
-        <label for="price">Price:</label>
-        <input> type="price" id="price" name"name" value="{{ .Data.Article.Price }}">
-    </div>
-    <div>
-        <label for="image">Choose file to upload</label>
-        <input type="image" id="image" name="image" value="{{ .Data.Article.ImageUrl }}">
-
-    </div>
-
-    <div>
-        <button type="submit">Register</button>
-    </div>
-</form>
-</div>
-
-
 
 {{ template "header"  }}

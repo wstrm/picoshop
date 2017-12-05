@@ -1,4 +1,4 @@
-package controller
+package search
 
 import (
 	"context"
@@ -51,6 +51,6 @@ func (a *searchHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	return
 }
 
-func newSearchHandler() *searchHandler {
+func NewHandler() *searchHandler {
 	return &searchHandler{}
 }

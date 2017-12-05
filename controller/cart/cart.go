@@ -1,4 +1,4 @@
-package controller
+package cart
 
 import (
 	"net/http"
@@ -34,6 +34,6 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	}
 }
 
-func newCartHandler() *cartHandler {
+func NewHandler() *cartHandler {
 	return &cartHandler{}
 }

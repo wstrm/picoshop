@@ -1,4 +1,4 @@
-package controller
+package article
 
 import (
 	"net/http"
@@ -22,6 +22,6 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	http.NotFound(writer, request)
 }
 
-func newArticleHandler() *articleHandler {
+func NewHandler() *articleHandler {
 	return &articleHandler{}
 }

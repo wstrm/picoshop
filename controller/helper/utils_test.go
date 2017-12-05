@@ -1,8 +1,9 @@
-package controller_test
+package helper_test
 
 import (
-	"github.com/willeponken/picoshop/controller"
 	"testing"
+
+	"github.com/willeponken/picoshop/controller"
 )
 
 func TestIsFilled(t *testing.T) {

@@ -1,4 +1,4 @@
-package controller
+package register
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/willeponken/picoshop/controller/helper"
 	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
@@ -24,6 +25,7 @@ type registerData struct {
 	PhoneNumber    string
 	Password       string
 	PasswordRetype string
+	Type           string
 }
 
 func emailAlreadyRegisteredError(email string) error {
@@ -59,16 +61,20 @@ func legalPassword(password, passwordRetype string) error {
 
 func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
+	userType := request.URL.Query().Get("type")
 
 	switch request.Method {
 	case http.MethodGet: // Serve register view
-		renderRegister(ctx, writer, http.StatusOK, nil)
+		renderRegister(ctx, writer, http.StatusOK, registerData{
+			Type: userType,
+		})
 
 	case http.MethodPost: // Retreive user registration
 		err := request.ParseForm()
 		if err != nil {
 			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
-				Error: invalidFormDataError().Error(),
+				Error: helper.InvalidFormDataError().Error(),
+				Type:  userType,
 			})
 			return
 		}
@@ -79,7 +85,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		password := request.PostFormValue("password")
 		passwordRetype := request.PostFormValue("password-retype")
 
-		if err := IsFilled(email, name, phoneNumber, password, passwordRetype); err != nil {
+		if err := helper.IsFilled(email, name, phoneNumber, password, passwordRetype); err != nil {
 			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
 				Error:          err.Error(),
 				Email:          email,
@@ -87,6 +93,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 				PhoneNumber:    phoneNumber,
 				Password:       password,
 				PasswordRetype: passwordRetype,
+				Type:           userType,
 			})
 			return
 		}
@@ -97,6 +104,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 				Email:       email,
 				Name:        name,
 				PhoneNumber: phoneNumber,
+				Type:        userType,
 				// Ignore passwords (force the user to retype invalid data)
 			})
 			return
@@ -104,18 +112,19 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 
 		customer, err := model.PutCustomer(model.NewCustomer(email, name, password, phoneNumber))
 		if err != nil {
-			code := getSqlErrorCode(err)
+			code := helper.GetSqlErrorCode(err)
 			var userErr error
 
 			switch code {
-			case DuplicateKeySqlError:
+			case helper.DuplicateKeySqlError:
 				userErr = emailAlreadyRegisteredError(email)
 			default:
-				userErr = internalServerError()
+				userErr = helper.InternalServerError()
 			}
 
 			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
 				Error: userErr.Error(),
+				Type:  userType,
 				// Ignore data, apparently it's dangerous!
 			})
 			return
@@ -125,7 +134,8 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 		if err != nil {
 			log.Println(err)
 			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
-				Error: internalServerError().Error(),
+				Error: helper.InternalServerError().Error(),
+				Type:  userType,
 			})
 		}
 
@@ -133,7 +143,7 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 	}
 }
 
-func newRegisterHandler(authManager *auth.Manager) *registerHandler {
+func NewHandler(authManager *auth.Manager) *registerHandler {
 	return &registerHandler{
 		authManager: authManager,
 	}

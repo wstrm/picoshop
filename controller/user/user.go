@@ -1,4 +1,4 @@
-package controller
+package user
 
 import (
 	"net/http"
@@ -23,6 +23,6 @@ func (u *userHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	}
 }
 
-func newUserHandler() *userHandler {
+func NewHandler() *userHandler {
 	return &userHandler{}
 }

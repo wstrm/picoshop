@@ -1,20 +1,22 @@
 package controller
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/willeponken/picoshop/controller/admin"
+	"github.com/willeponken/picoshop/controller/article"
+	"github.com/willeponken/picoshop/controller/cart"
+	"github.com/willeponken/picoshop/controller/home"
+	"github.com/willeponken/picoshop/controller/login"
+	"github.com/willeponken/picoshop/controller/logout"
+	"github.com/willeponken/picoshop/controller/register"
+	"github.com/willeponken/picoshop/controller/search"
+	"github.com/willeponken/picoshop/controller/static"
+	"github.com/willeponken/picoshop/controller/user"
+	"github.com/willeponken/picoshop/controller/warehouse"
 	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 )
-
-func internalServerError() error {
-	return errors.New("Something internal went wrong!")
-}
-
-func invalidFormDataError() error {
-	return errors.New("Invalid form data")
-}
 
 func getEmployeePolicy() auth.Policy {
 	policy := auth.NewPolicy()
@@ -71,17 +73,38 @@ func New() *http.ServeMux {
 	adminPolicy := getAdminPolicy()       // A
 	userPolicy := getUserPolicy()         // A, W, C
 
-	mux.Handle("/", a.Middleware(newHomeHandler(), openPolicy))
-	mux.Handle("/login", a.Middleware(newLoginHandler(a), openPolicy))
-	mux.Handle("/logout", a.Middleware(newLogoutHandler(a), openPolicy))
-	mux.Handle("/register", a.Middleware(newRegisterHandler(a), openPolicy))
-	mux.Handle("/user", a.Middleware(newUserHandler(), userPolicy))
-	mux.Handle("/article", a.Middleware(newArticleHandler(), openPolicy))
-	mux.Handle("/cart", a.Middleware(newCartHandler(), userPolicy))
-	mux.Handle("/static/", newStaticHandler()) // static does not need to be intercepted with user information
-	mux.Handle("/admin", a.Middleware(newAdminHandler(), adminPolicy))
-	mux.Handle("/warehouse", a.Middleware(newWarehouseHandler(), employeePolicy))
-	mux.Handle("/search", a.Middleware(newSearchHandler(), openPolicy))
+	mux.Handle("/", a.Middleware(
+		home.NewHandler(), openPolicy))
+
+	mux.Handle("/login", a.Middleware(
+		login.NewHandler(a), openPolicy))
+
+	mux.Handle("/logout", a.Middleware(
+		logout.NewHandler(a), openPolicy))
+
+	mux.Handle("/register", a.Middleware(
+		register.NewHandler(a), openPolicy))
+
+	mux.Handle("/user", a.Middleware(
+		user.NewHandler(), userPolicy))
+
+	mux.Handle("/article", a.Middleware(
+		article.NewHandler(), openPolicy))
+
+	mux.Handle("/cart", a.Middleware(
+		cart.NewHandler(), userPolicy))
+
+	mux.Handle("/admin/", a.Middleware(
+		http.StripPrefix("/admin",
+			admin.NewMux()), adminPolicy))
+
+	mux.Handle("/warehouse", a.Middleware(
+		warehouse.NewHandler(), employeePolicy))
+
+	mux.Handle("/search", a.Middleware(
+		search.NewHandler(), openPolicy))
+
+	mux.Handle("/static/", http.StripPrefix("/static", static.NewHandler()))
 
 	return mux
 }
