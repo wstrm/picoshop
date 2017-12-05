@@ -29,7 +29,7 @@ func NewPolicy() Policy {
 	return Policy{}
 }
 
-func (policy Policy) SetUser(user User, authorize bool) {
+func (policy *Policy) SetUser(user User, authorize bool) {
 	policy.protected = true
 
 	if policy.authorization == nil {
@@ -38,14 +38,14 @@ func (policy Policy) SetUser(user User, authorize bool) {
 	policy.authorization[getUserKey(user)] = authorize
 }
 
-func (policy Policy) SetProtected(protected bool) {
+func (policy *Policy) SetProtected(protected bool) {
 	if len(policy.authorization) > 0 && !protected {
 		panic("policy cannot be unprotected and contain authorization map for users")
 	}
 	policy.protected = protected
 }
 
-func (policy Policy) isAllowed(key string) bool {
+func (policy *Policy) isAllowed(key string) bool {
 	if !policy.protected {
 		return true // unprotected
 	}
@@ -95,23 +95,25 @@ func (manager *Manager) Middleware(next http.Handler, policy Policy) http.Handle
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		user, err := manager.getUser(request)
 
-		// no user found, and unprotected handler
-		if err != nil && !policy.protected {
-			next.ServeHTTP(writer, request)
-			return
+		// no user found
+		if err != nil || !user.IsValid() {
+			if !policy.protected { // unprotected handler, allow
+				next.ServeHTTP(writer, request)
+				return
+			} else { // protected, disallow
+				http.Redirect(writer, request, "/", http.StatusSeeOther)
+				return
+			}
 		}
 
-		key := getUserKey(user)
-
 		// user found, add to context
-		if user.IsValid() {
-			ctx := context.WithValue(request.Context(), key, user)
+		key := getUserKey(user)
+		ctx := context.WithValue(request.Context(), key, user)
 
-			if policy.isAllowed(key) { // is allowed
-				next.ServeHTTP(writer, request.WithContext(ctx))
-			} else { // authorization declined
-				http.Redirect(writer, request.WithContext(ctx), "/", http.StatusSeeOther)
-			}
+		if policy.isAllowed(key) { // is allowed
+			next.ServeHTTP(writer, request.WithContext(ctx))
+		} else { // authorization declined
+			http.Redirect(writer, request.WithContext(ctx), "/", http.StatusSeeOther)
 		}
 	})
 }
