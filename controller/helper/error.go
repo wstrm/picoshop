@@ -2,6 +2,7 @@ package helper
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -24,4 +25,8 @@ func InternalServerError() error {
 
 func InvalidFormDataError() error {
 	return errors.New("Invalid form data")
+}
+
+func EmailAlreadyRegisteredError(email string) error {
+	return fmt.Errorf("The email address '%s' is already registered", email)
 }

@@ -2,14 +2,11 @@ package register
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/willeponken/picoshop/controller/helper"
 	"github.com/willeponken/picoshop/middleware/auth"
-	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
 
@@ -18,19 +15,7 @@ type registerHandler struct {
 	authManager *auth.Manager
 }
 
-type registerData struct {
-	Error          string
-	Email          string
-	Name           string
-	PhoneNumber    string
-	Password       string
-	PasswordRetype string
-	Type           string
-}
-
-func emailAlreadyRegisteredError(email string) error {
-	return fmt.Errorf("The email address '%s' is already registered", email)
-}
+type registerData helper.RegisterResult
 
 func renderRegister(ctx context.Context, writer http.ResponseWriter, code int, data interface{}) {
 	writer.WriteHeader(code)
@@ -45,18 +30,6 @@ func renderRegister(ctx context.Context, writer http.ResponseWriter, code int, d
 	}
 
 	view.Render(ctx, writer, "register", page)
-}
-
-func legalPassword(password, passwordRetype string) error {
-	if password != passwordRetype {
-		return errors.New("re-typed password must equal original")
-	}
-
-	if len(password) < 8 {
-		return errors.New("password must be atleast 8 characters long")
-	}
-
-	return nil
 }
 
 func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -79,64 +52,24 @@ func (r *registerHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 			return
 		}
 
-		email := request.PostFormValue("email")
-		name := request.PostFormValue("name")
-		phoneNumber := request.PostFormValue("phone-number")
-		password := request.PostFormValue("password")
-		passwordRetype := request.PostFormValue("password-retype")
+		form := helper.ParseRegisterFormValues(request)
+		log.Println(form)
+		user, result, code := helper.Register(userType, form)
+		log.Println(user, result, code)
 
-		if err := helper.IsFilled(email, name, phoneNumber, password, passwordRetype); err != nil {
-			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
-				Error:          err.Error(),
-				Email:          email,
-				Name:           name,
-				PhoneNumber:    phoneNumber,
-				Password:       password,
-				PasswordRetype: passwordRetype,
-				Type:           userType,
-			})
+		if code != http.StatusOK {
+			renderRegister(ctx, writer, code, result)
 			return
 		}
 
-		if err := legalPassword(password, passwordRetype); err != nil {
-			renderRegister(ctx, writer, http.StatusBadRequest, registerData{
-				Error:       err.Error(),
-				Email:       email,
-				Name:        name,
-				PhoneNumber: phoneNumber,
-				Type:        userType,
-				// Ignore passwords (force the user to retype invalid data)
-			})
-			return
-		}
-
-		customer, err := model.PutCustomer(model.NewCustomer(email, name, password, phoneNumber))
-		if err != nil {
-			code := helper.GetSqlErrorCode(err)
-			var userErr error
-
-			switch code {
-			case helper.DuplicateKeySqlError:
-				userErr = emailAlreadyRegisteredError(email)
-			default:
-				userErr = helper.InternalServerError()
-			}
-
-			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
-				Error: userErr.Error(),
-				Type:  userType,
-				// Ignore data, apparently it's dangerous!
-			})
-			return
-		}
-
-		err = r.authManager.Login(customer.User, writer, request)
+		err = r.authManager.Login(user, writer, request)
 		if err != nil {
 			log.Println(err)
 			renderRegister(ctx, writer, http.StatusInternalServerError, registerData{
 				Error: helper.InternalServerError().Error(),
 				Type:  userType,
 			})
+			return
 		}
 
 		http.Redirect(writer, request, "/", http.StatusSeeOther) // See RFC 2616 (redirect after POST)

@@ -151,6 +151,12 @@ func NewAdmin(email, name, password, phoneNumber string) Admin {
 	}
 }
 
+func NewWarehouse(email, name, password, phoneNumber string) Warehouse {
+	return Warehouse{
+		User: NewUser(email, name, password, phoneNumber),
+	}
+}
+
 func validPassword(hash []byte, password string) (ok bool) {
 	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	if err != nil {
