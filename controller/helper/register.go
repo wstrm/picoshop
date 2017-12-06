@@ -78,7 +78,7 @@ func Register(userType string, form RegisterForm) (user auth.User, result Regist
 	}
 
 	var err error
-	switch form.Type {
+	switch userType {
 	case "admin":
 		user, err = model.PutAdmin(model.NewAdmin(form.Email, form.Name, form.Password, form.PhoneNumber))
 	case "warehouse":

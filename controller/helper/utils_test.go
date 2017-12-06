@@ -3,7 +3,7 @@ package helper_test
 import (
 	"testing"
 
-	"github.com/willeponken/picoshop/controller"
+	"github.com/willeponken/picoshop/controller/helper"
 )
 
 func TestIsFilled(t *testing.T) {
@@ -24,7 +24,7 @@ func TestIsFilled(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := controller.IsFilled(test.fields...) != nil
+		result := helper.IsFilled(test.fields...) != nil
 		if result != test.err {
 			t.Errorf("result != %v, should return %v", test.err, !test.err)
 		}
