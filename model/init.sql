@@ -55,11 +55,11 @@ CREATE TABLE IF NOT EXISTS article (
 	FOREIGN KEY (comments)
 		REFERENCES comments(id),
 
-	id INT NOT NULL,
+	id INT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
-	image_url VARCHAR(255) NOT NULL,
+	image_name VARCHAR(255) NOT NULL,
 	comments INT NULL);
 
 /* Create order_has_articles table */

@@ -1,31 +1,35 @@
 {{ define "register-form" }}
 
-{{ template "error" .Error }}
+{{ if (and (eq .Result.Error "") .Result.Name .Result.Email) }}
+	{{ template "success" (printf "Registered %s with the E-mail address %s" .Result.Name .Result.Email) }}
+{{ else }}
+	{{ template "error" .Result.Error }}
 
-<form action="/register?{{ .Type }}" method="post" class="default-form">
-	<div>
-		<label for="email">E-mail:</label>
-		<input type="email" id="email" name="email" value="{{ .Email }}">
-	</div>
-	<div>
-		<label for="name">Name:</label>
-		<input type="text" id="name" name="name" value="{{ .Name }}">
-	</div>
-	<div>
-		<label for="phone-number">Phone number:</label>
-		<input type="tel" id="phone-number" name="phone-number" value="{{ .PhoneNumber }}">
-	</div>
-	<div>
-		<label for="password">Password:</label>
-		<input type="password" id="password" name="password" value="{{ .Password }}">
-	</div>
-	<div>
-		<label for="password-retype">Re-type password:</label>
-		<input type="password" id="password-retype" name="password-retype" value="{{ .PasswordRetype }}">
-	</div>
-	<div>
-		<button type="submit">Register</button>
-	</div>
-</form>
+	<form action="{{ .Endpoint }}" method="post" class="default-form">
+		<div>
+			<label for="email">E-mail:</label>
+			<input type="email" id="email" name="email" value="{{ .Result.Email }}">
+		</div>
+		<div>
+			<label for="name">Name:</label>
+			<input type="text" id="name" name="name" value="{{ .Result.Name }}">
+		</div>
+		<div>
+			<label for="phone-number">Phone number:</label>
+			<input type="tel" id="phone-number" name="phone-number" value="{{ .Result.PhoneNumber }}">
+		</div>
+		<div>
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" value="{{ .Result.Password }}">
+		</div>
+		<div>
+			<label for="password-retype">Re-type password:</label>
+			<input type="password" id="password-retype" name="password-retype" value="{{ .Result.PasswordRetype }}">
+		</div>
+		<div>
+			<button type="submit">Register</button>
+		</div>
+	</form>
+{{ end }}
 
 {{ end }}

@@ -1,14 +1,12 @@
 package helper
 
-import (
-	"errors"
-)
+import "fmt"
 
 // IsFilled checks if all fields are filled, else it'll return an error.
 func IsFilled(fields ...string) error {
-	for _, field := range fields {
+	for id, field := range fields {
 		if field == "" {
-			return errors.New("all fields must be filled")
+			return fmt.Errorf("field number: %d is not filled", id)
 		}
 	}
 

@@ -3,14 +3,15 @@
 <div class = "midbox">
 	<h3>Administration panel</h3>
 
-	<h4>Register new user</h4>
 	<ul>
-		<li><a href="/register?admin">Admin</a></li>
-		<li><a href="/register?customer">Customer</a></li>
-		<li><a href="/register?warehouse">Warehouse</a></li>
+		<li><a href="/admin/register?type=admin">Register admin</a></li>
+		<li><a href="/admin/register?type=customer">Register customer</a></li>
+		<li><a href="/admin/register?type=warehouse">Register warehouse</a></li>
+		<li><a href="/admin/article">Add article</a></li>
 	</ul>
 
-	<h3>Add article</h3>
+	<!--<h3>Add article</h3>-->
+	<!--
 	<form action="/article" method="post" enctype="multipart/form-data">
 		<div>
 			<label for="article">Article:</label>
@@ -56,7 +57,7 @@
 			<button type="submit">Register</button>
 		</div>
 	</form>
-</div>
+	</div> -->
 </div>
 
 {{ template "header"  }}

@@ -7,7 +7,7 @@
   O hai! Register today for fast checkouts and great offers.
   </p>
 
-  {{ template "register-form" .Data }}
+  {{ template "register-form" dict "Result" .Data "Endpoint" "/register" }}
 
   <p>
   <small>

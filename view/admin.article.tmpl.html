@@ -1,0 +1,39 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+	<h3>Administration panel</h3>
+
+	<h4>Add new article</h4>
+
+{{ if (and (eq .Data.Error "") .Data.Name .Data.Id) }}
+	{{ template "success" (printf "Created new article %s with the ID %d" .Data.Name .Data.Id) }}
+{{ else }}
+	{{ template "error" .Data.Error }}
+
+	<form action="/admin/article" method="post" enctype="multipart/form-data">
+		<div>
+			<label for="name">Name:</label>
+			<input type="text" id="name" name="name" value="{{ .Data.Name }}">
+		</div>
+		<div>
+			<label for="description">Description:</label>
+			<input type="text" id="description" name="description" value="{{ .Data.Description }}">
+		</div>
+		<div>
+			<label for="price">Price:</label>
+			<input type="text" id="price" name="price" value="{{ .Data.Price }}">
+		</div>
+		<div>
+			<label for="image">Choose image to upload</label>
+			<input type="file" id="image" name="image">
+
+		</div>
+
+		<div>
+			<button type="submit">Register</button>
+		</div>
+	</form>
+</div>
+{{ end }}
+
+{{ template "footer" }}

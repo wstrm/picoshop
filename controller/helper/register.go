@@ -107,6 +107,15 @@ func Register(userType string, form RegisterForm) (user auth.User, result Regist
 		return
 	}
 
+	result = RegisterResult{
+		Error:          "",
+		Email:          form.Email,
+		Name:           form.Name,
+		PhoneNumber:    form.PhoneNumber,
+		Password:       form.Password,
+		PasswordRetype: form.PasswordRetype,
+		Type:           userType,
+	}
 	code = http.StatusOK
 	return
 }

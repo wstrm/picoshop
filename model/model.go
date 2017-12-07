@@ -52,20 +52,20 @@ type Customer struct {
 }
 
 type Order struct {
-	Customer   int
-	Address    int
-	Articles   int
+	Customer   int64
+	Address    int64
+	Articles   int64
 	Status     int
 	CreateTime time.Time
 }
 
 type Article struct {
-	Id          int
+	Id          int64
 	Name        string
 	Description string
-	Price       uint
-	ImageUrl    string
-	Comments    int
+	Price       uint64
+	ImageName   string
+	Comments    int64
 }
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
@@ -154,6 +154,15 @@ func NewAdmin(email, name, password, phoneNumber string) Admin {
 func NewWarehouse(email, name, password, phoneNumber string) Warehouse {
 	return Warehouse{
 		User: NewUser(email, name, password, phoneNumber),
+	}
+}
+
+func NewArticle(name, description string, price uint64, imageName string) Article {
+	return Article{
+		Name:        name,
+		Description: description,
+		Price:       price,
+		ImageName:   imageName,
 	}
 }
 
@@ -367,7 +376,7 @@ func GetAllOrders() (orders []Order, err error) {
 
 func SearchForArticles(query string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT id, name, description, price, image_url, comments
+		SELECT id, name, description, price, image_name, comments
 		FROM .article WHERE name = ?`, query)
 	if err != nil {
 		return
@@ -380,7 +389,7 @@ func SearchForArticles(query string) (articles []Article, err error) {
 
 		err = rows.Scan(
 			&article.Id, &article.Name, &article.Description,
-			&article.Price, &article.ImageUrl, &article.Comments)
+			&article.Price, &article.ImageName, &article.Comments)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -392,12 +401,17 @@ func SearchForArticles(query string) (articles []Article, err error) {
 	return
 }
 
-func PutArticle(article Article) (err error) {
-	_, err = database.Exec(`
+func PutArticle(article Article) (Article, error) {
+	result, err := database.Exec(`
 		INSERT INTO article
-		(name, description, price, image_url)
+		(name, description, price, image_name)
 		VALUES
-		( ?, ?, ?, ?)
-	`, &article.Name, &article.Description, &article.Price, &article.ImageUrl)
-	return
+		(?, ?, ?, ?)
+	`, &article.Name, &article.Description, &article.Price, &article.ImageName)
+	if err != nil {
+		return Article{}, err
+	}
+
+	article.Id, err = result.LastInsertId()
+	return article, err
 }

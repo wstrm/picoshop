@@ -1,6 +1,8 @@
 /cmd/picoshopd/picoshopd
 /picoshopd
 /coverage.txt
+/static/image/*
+!/static/image/.gitkeep
 
 .idea
 *.key

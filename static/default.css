@@ -114,6 +114,12 @@ span.error {
 	font-weight: bold;
 }
 
+/* success */
+span.success {
+	color: green;
+	font-weight: bold;
+}
+
 /* horizontal-navbar */
 ul.horizontal-navbar {
 	list-style-type: none;

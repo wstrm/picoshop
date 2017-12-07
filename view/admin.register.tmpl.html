@@ -1,0 +1,11 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+	<h3>Administration panel</h3>
+
+	<h4>Register new {{ .Data.Type }}</h4>
+
+	{{ template "register-form" dict "Result" .Data "Endpoint" (printf "%s%s" "/admin/register?type=" .Data.Type) }}
+</div>
+
+{{ template "footer" }}
