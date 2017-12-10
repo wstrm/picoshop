@@ -4,9 +4,21 @@
   <h1>Picoshop</h1>
   <p>Welcome to Picoshop!</p>
   <p>
-  Test here: {{ context "email" }}
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ultricies vehicula malesuada. Aenean eu dapibus purus. Suspendisse elementum aliquam lectus, ac blandit leo condimentum id. Etiam efficitur ut massa sit amet commodo. Ut fermentum, ex non finibus rhoncus, ligula neque dapibus dolor, vel vehicula enim risus sed dui. Mauris ut est sodales, sollicitudin lectus nec, eleifend eros. In venenatis quam.
+  Picoshop is the to-go-place for your pickle needs. We sell a variety of pickles, from small slim-fit pickles to the largest plus-size!
+  In our Cutlery department we have Sporks, dessert tooling and the luxury Couteau de Picleu knifes.
   </p>
+
+  {{ with .Data.Highlights }}
+  <h2>Product highlights</h2>
+  <p>Maybe you are interested in...</p>
+  {{ range . }}
+  <a href="/article?id={{ .Id }}">
+	  <h3>{{ .Name }}</h3>
+	  <img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
+	  <p><em>Only {{ .Price }}!</em></p>
+  </a>
+  {{ end }}
+  {{ end }}
 </div>
 
 {{ template "footer" }}

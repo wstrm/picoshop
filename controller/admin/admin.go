@@ -125,7 +125,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 
-		u, err := strconv.ParseUint(price, 10, 0)
+		u, err := strconv.ParseFloat(price, 10)
 		if err != nil {
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return

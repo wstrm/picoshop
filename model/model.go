@@ -63,9 +63,21 @@ type Article struct {
 	Id          int64
 	Name        string
 	Description string
-	Price       uint64
+	Price       float64
 	ImageName   string
 	Comments    int64
+}
+
+type Category struct {
+	Id            int64
+	Name          string
+	Subcategories int64
+}
+
+type Subcategory struct {
+	Id       int64
+	Name     string
+	Articles int64
 }
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
@@ -157,7 +169,7 @@ func NewWarehouse(email, name, password, phoneNumber string) Warehouse {
 	}
 }
 
-func NewArticle(name, description string, price uint64, imageName string) Article {
+func NewArticle(name, description string, price float64, imageName string) Article {
 	return Article{
 		Name:        name,
 		Description: description,
@@ -414,4 +426,175 @@ func PutArticle(article Article) (Article, error) {
 
 	article.Id, err = result.LastInsertId()
 	return article, err
+}
+
+func GetAllCategories() (categories []Category, err error) {
+	rows, err := database.Query(`
+		SELECT (id, name, subcategories)
+		FROM category`)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		category := Category{}
+
+		err = rows.Scan(
+			&category.Id, &category.Name, &category.Subcategories)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		categories = append(categories, category)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func GetSubcategoriesFromCategory(category Category) (subcategories []Subcategory, err error) {
+	rows, err := database.Query(`
+		SELECT (subcategory.id, subcategory.name, subcategory.articles)
+		FROM category WHERE category.id=?
+
+		INNER JOIN subcategories
+		ON category.subcategories = category_has_subcategories.id
+
+		INNER JOIN subcategory
+		ON category_has_subcategories.subcategory = subcategory.id
+	`, category.Id)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		subcategory := Subcategory{}
+
+		err = rows.Scan(
+			&subcategory.Id, &subcategory.Name, &subcategory.Articles)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		subcategories = append(subcategories, subcategory)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, err error) {
+	rows, err := database.Query(`
+		SELECT (article.id, article.name, article.description, article.price, article.image_name, article.comments)
+		FROM subcategory WHERE subcategory.id=?
+
+		INNER JOIN articles
+		ON subcategory.articles = subcategory_has_articles.id
+
+		INNER JOIN article
+		ON subcategory_has_articles.article = article.id
+	`, subcategory.Id)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Comments)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		articles = append(articles, article)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func GetArticleHighlights(n uint) (articles []Article, err error) {
+	rows, err := database.Query(`
+		SELECT id, name, description, price, image_name, comments
+		FROM article
+		WHERE rand() <= 0.3
+		LIMIT ?
+	`, n)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	var comments sql.NullInt64
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &comments)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		if comments.Valid {
+			article.Comments = comments.Int64
+		}
+
+		articles = append(articles, article)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func GetArticleById(id int64) (article Article, err error) {
+	var comments sql.NullInt64
+	err = database.QueryRow(`
+		SELECT id, name, description, price, image_name, comments
+		FROM article
+		WHERE id=?
+	`, id).Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &comments)
+
+	if comments.Valid {
+		article.Comments = comments.Int64
+	}
+
+	return
+}
+
+func PutCategory(name string) (int64, error) {
+	result, err := database.Exec(`
+		INSERT INTO category
+		(name)
+		VALUES
+		(?)
+	`, name)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	return id, err
+}
+
+func PutSubCategory(name string) (int64, error) {
+	result, err := database.Exec(`
+		INSERT INTO subcategory
+		(name)
+		VALUES
+		(?)
+	`, name)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	return id, err
 }

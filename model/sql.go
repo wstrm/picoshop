@@ -1,4 +1,4 @@
-// This file is generated automatically by inlinesql at 2017-12-07 16:57:41.873427298 +0100 CET m=+0.001005277.
+// This file is generated automatically by inlinesql at 2017-12-10 21:52:04.159254354 +0100 CET m=+0.001152168.
 package model
 
 func getQueries() []string {
@@ -10,7 +10,11 @@ func getQueries() []string {
 		"CREATE TABLE IF NOT EXISTS user_has_address ( PRIMARY KEY (id), FOREIGN KEY (address) REFERENCES address(id), id INT AUTO_INCREMENT, address INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS `user` ( PRIMARY KEY (id), FOREIGN KEY (addresses)  REFERENCES user_has_address(id)  ON DELETE CASCADE, UNIQUE INDEX uc_email (email ASC), id INT AUTO_INCREMENT, email VARCHAR(255) NOT NULL, hash BINARY(60) NOT NULL, name VARCHAR(255) NOT NULL, phone_number VARCHAR(50), create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, addresses INT NULL)",
 		"CREATE TABLE IF NOT EXISTS comments ( PRIMARY KEY (id), FOREIGN KEY (customer)  REFERENCES customer(id), id INT NOT NULL, rating DECIMAL(10, 0) NOT NULL,  text VARCHAR(255), create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, customer INT NOT NULL)",
-		"CREATE TABLE IF NOT EXISTS article ( PRIMARY KEY (id), FOREIGN KEY (comments)  REFERENCES comments(id), id INT AUTO_INCREMENT, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, price DECIMAL(11, 4) NOT NULL,  image_name VARCHAR(255) NOT NULL, comments INT NULL)",
+		"CREATE TABLE IF NOT EXISTS article ( PRIMARY KEY (id), FOREIGN KEY (comments)  REFERENCES comments(id), FOREIGN KEY (subcategory)  REFERENCES subcategory(id), id INT AUTO_INCREMENT, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, price DECIMAL(11, 4) NOT NULL,  image_name VARCHAR(255) NOT NULL, subcategory INT NULL, comments INT NULL)",
+		"CREATE TABLE IF NOT EXISTS subcategory ( PRIMARY KEY (id), FOREIGN KEY (articles)  REFERENCES subcategory_has_articles(id), FOREIGN KEY (category)  REFERENCES category(id), id INT AUTO_INCREMENT, name VARCHAR(255) NOT NULL, category INT NULL, articles INT NULL)",
+		"CREATE TABLE IF NOT EXISTS subcategory_has_articles ( PRIMARY KEY (id), FOREIGN KEY (articles)  REFERENCES articles(id), id INT AUTO_INCREMENT, articles INT NULL)",
+		"CREATE TABLE IF NOT EXISTS category ( PRIMARY KEY (id), FOREIGN KEY (categories)  REFERENCES category_has_subcategories(id), id INT AUTO_INCREMENT, name VARCHAR(255) NOT NULL, categories INT NULL)",
+		"CREATE TABLE IF NOT EXISTS category_has_subcategories ( PRIMARY KEY (id), FOREIGN KEY (subcategories)  REFERENCES subcategory(id), id INT AUTO_INCREMENT, subcategories INT NULL)",
 		"CREATE TABLE IF NOT EXISTS order_has_articles ( PRIMARY KEY(id), FOREIGN KEY(article)  REFERENCES article(id), id INT NOT NULL, article INT NOT NULL )",
 		"CREATE TABLE IF NOT EXISTS `order` ( PRIMARY KEY (id), FOREIGN KEY (customer)  REFERENCES customer(id), FOREIGN KEY (address)  REFERENCES address(id), FOREIGN KEY (articles)  REFERENCES order_has_articles(id), id INT AUTO_INCREMENT, customer INT NOT NULL, address INT NOT NULL, status INT(3) NOT NULL,  articles INT NOT NULL, create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE IF NOT EXISTS customer_has_orders ( PRIMARY KEY (id), FOREIGN KEY (`order`)  REFERENCES `order`(id), id INT AUTO_INCREMENT, `order` INT NULL)",

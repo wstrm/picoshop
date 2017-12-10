@@ -54,13 +54,57 @@ CREATE TABLE IF NOT EXISTS article (
 	PRIMARY KEY (id),
 	FOREIGN KEY (comments)
 		REFERENCES comments(id),
+	FOREIGN KEY (subcategory)
+		REFERENCES subcategory(id),
 
 	id INT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
 	image_name VARCHAR(255) NOT NULL,
+	subcategory INT NULL,
 	comments INT NULL);
+
+/* Create subcategory table */
+CREATE TABLE IF NOT EXISTS subcategory (
+	PRIMARY KEY (id),
+	FOREIGN KEY (articles)
+		REFERENCES subcategory_has_articles(id),
+	FOREIGN KEY (category)
+		REFERENCES category(id),
+
+	id INT AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	category INT NULL,
+	articles INT NULL);
+
+/* Create subcategory_has_articles table */
+CREATE TABLE IF NOT EXISTS subcategory_has_articles (
+	PRIMARY KEY (id),
+	FOREIGN KEY (articles)
+		REFERENCES articles(id),
+
+	id INT AUTO_INCREMENT,
+	articles INT NULL);
+
+/* Create category table */
+CREATE TABLE IF NOT EXISTS category (
+	PRIMARY KEY (id),
+	FOREIGN KEY (categories)
+		REFERENCES category_has_subcategories(id),
+
+	id INT AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	categories INT NULL);
+
+/* Create category_has_subcategories table */
+CREATE TABLE IF NOT EXISTS category_has_subcategories (
+	PRIMARY KEY (id),
+	FOREIGN KEY (subcategories)
+		REFERENCES subcategory(id),
+
+	id INT AUTO_INCREMENT,
+	subcategories INT NULL);
 
 /* Create order_has_articles table */
 CREATE TABLE IF NOT EXISTS order_has_articles (
