@@ -10,7 +10,7 @@
         </tr>
 	{{range $element := .Data.Articles}}
         <tr>
-            <td>{{ $element.Image}}</td>
+            <td><img class="article" src="/static/image/{{ $element.ImageName }}" alt="{{ $element.Name }} image"></img></td>
             <td>{{ $element.Name }}</td>
             <td>{{ $element.Price }}</td>
             <td></td>
