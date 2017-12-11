@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS category_has_subcategories (
 	/* subcategories can never have more than one category */
 	UNIQUE INDEX uc_subcategory (subcategory ASC),
 
-	category INT NOT NULL,
-	subcategory INT NOT NULL);
+	category VARCHAR(255) NOT NULL,
+	subcategory VARCHAR(255) NOT NULL);
 
 /* Create order_has_articles table */
 CREATE TABLE IF NOT EXISTS order_has_articles (

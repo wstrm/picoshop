@@ -15,6 +15,7 @@ import (
 	"github.com/willeponken/picoshop/controller/user"
 	"github.com/willeponken/picoshop/controller/warehouse"
 	"github.com/willeponken/picoshop/middleware/auth"
+	"github.com/willeponken/picoshop/middleware/category"
 	"github.com/willeponken/picoshop/model"
 )
 
@@ -73,36 +74,36 @@ func New() *http.ServeMux {
 	adminPolicy := getAdminPolicy()       // A
 	userPolicy := getUserPolicy()         // A, W, C
 
-	mux.Handle("/", a.Middleware(
-		home.NewHandler(), openPolicy))
+	mux.Handle("/", category.Middleware(a.Middleware(
+		home.NewHandler(), openPolicy)))
 
-	mux.Handle("/login", a.Middleware(
-		login.NewHandler(a), openPolicy))
+	mux.Handle("/login", category.Middleware(a.Middleware(
+		login.NewHandler(a), openPolicy)))
 
-	mux.Handle("/logout", a.Middleware(
-		logout.NewHandler(a), openPolicy))
+	mux.Handle("/logout", category.Middleware(a.Middleware(
+		logout.NewHandler(a), openPolicy)))
 
-	mux.Handle("/register", a.Middleware(
-		register.NewHandler(a), openPolicy))
+	mux.Handle("/register", category.Middleware(a.Middleware(
+		register.NewHandler(a), openPolicy)))
 
-	mux.Handle("/user", a.Middleware(
-		user.NewHandler(), userPolicy))
+	mux.Handle("/user", category.Middleware(a.Middleware(
+		user.NewHandler(), userPolicy)))
 
-	mux.Handle("/article", a.Middleware(
-		article.NewHandler(), openPolicy))
+	mux.Handle("/article", category.Middleware(a.Middleware(
+		article.NewHandler(), openPolicy)))
 
-	mux.Handle("/cart", a.Middleware(
-		cart.NewHandler(), userPolicy))
+	mux.Handle("/cart", category.Middleware(a.Middleware(
+		cart.NewHandler(), userPolicy)))
 
-	mux.Handle("/admin/", a.Middleware(
+	mux.Handle("/admin/", category.Middleware(a.Middleware(
 		http.StripPrefix("/admin",
-			admin.NewMux()), adminPolicy))
+			admin.NewMux()), adminPolicy)))
 
-	mux.Handle("/warehouse", a.Middleware(
-		warehouse.NewHandler(), employeePolicy))
+	mux.Handle("/warehouse", category.Middleware(a.Middleware(
+		warehouse.NewHandler(), employeePolicy)))
 
-	mux.Handle("/search", a.Middleware(
-		search.NewHandler(), openPolicy))
+	mux.Handle("/search", category.Middleware(a.Middleware(
+		search.NewHandler(), openPolicy)))
 
 	mux.Handle("/static/", http.StripPrefix("/static", static.NewHandler()))
 

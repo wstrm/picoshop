@@ -26,7 +26,16 @@
 		<div>
 			<label for="image">Choose image to upload</label>
 			<input type="file" id="image" name="image">
+		</div>
 
+		<div>
+			<label for="category">Category:</label>
+			<input type="text" id="category" name="category" value="{{ .Data.Category }}">
+		</div>
+
+		<div>
+			<label for="subcategory">Subcategory:</label>
+			<input type="text" id="subcategory" name="subcategory" value="{{ .Data.Subcategory }}">
 		</div>
 
 		<div>

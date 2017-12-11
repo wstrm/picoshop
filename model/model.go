@@ -170,8 +170,6 @@ func NewWarehouse(email, name, password, phoneNumber string) Warehouse {
 }
 
 func NewArticle(name, description string, price float64, imageName string, category string, subcategory string) Article {
-	ensureSubcategoryWithCategory(NewCategory(category), NewSubcategory(subcategory))
-
 	return Article{
 		Name:        name,
 		Description: description,
@@ -430,11 +428,13 @@ func SearchForArticles(query string) (articles []Article, err error) {
 }
 
 func PutArticle(article Article) (Article, error) {
+	ensureSubcategoryWithCategory(NewCategory(article.Category), NewSubcategory(article.Subcategory))
+
 	result, err := database.Exec(`
 		INSERT INTO article
 		(name, description, price, image_name, category, subcategory)
 		VALUES
-		(?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?)
 	`, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
 	if err != nil {
 		return Article{}, err
@@ -446,27 +446,39 @@ func PutArticle(article Article) (Article, error) {
 
 func GetAllCategories() (categories []Category, err error) {
 	rows, err := database.Query(`
-		SELECT (name, subcategories)
-		FROM category`)
+		SELECT category, subcategory
+		FROM category_has_subcategories
+		ORDER BY category
+		`)
 	if err != nil {
 		return
 	}
 
 	defer rows.Close()
 
-	for rows.Next() {
-		category := Category{}
+	c := make(map[string][]Subcategory)
+	var k, v string
 
-		err = rows.Scan(
-			&category.Name, &category.Subcategories)
+	for rows.Next() {
+		err = rows.Scan(&k, &v)
 		if err != nil {
 			log.Panicln(err)
 		}
 
-		categories = append(categories, category)
+		c[k] = append(c[k], NewSubcategory(v))
+	}
+	err = rows.Err()
+	if err != nil {
+		return
 	}
 
-	err = rows.Err()
+	for name, subcategories := range c {
+		categories = append(categories, Category{
+			Name:          name,
+			Subcategories: subcategories,
+		})
+	}
+
 	return
 }
 

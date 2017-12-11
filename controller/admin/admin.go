@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -42,6 +43,8 @@ type articleData struct {
 	Description string
 	Price       string
 	Id          int64
+	Category    string
+	Subcategory string
 }
 
 func (a *rootHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -96,6 +99,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 		in, handler, err := request.FormFile("image")
 		if err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -105,6 +109,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		imageName := fmt.Sprintf("%s-%s", randomString(10), handler.Filename)
 		out, err := os.OpenFile("./static/image/"+imageName, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -112,6 +117,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 		_, err = io.Copy(out, in)
 		if err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -123,18 +129,21 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		subcategory := request.PostFormValue("subcategory")
 
 		if err := helper.IsFilled(name, description, price, category, subcategory); err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
 		u, err := strconv.ParseFloat(price, 10)
 		if err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
 		article, err := model.PutArticle(model.NewArticle(name, description, u, imageName, category, subcategory))
 		if err != nil {
+			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}

@@ -1,4 +1,4 @@
-// This file is generated automatically by inlinesql at 2017-12-11 10:19:07.821155692 +0100 CET m=+0.001222059.
+// This file is generated automatically by inlinesql at 2017-12-11 15:08:22.739840949 +0100 CET m=+0.001056910.
 package model
 
 func getQueries() []string {
@@ -15,7 +15,7 @@ func getQueries() []string {
 		"CREATE TABLE IF NOT EXISTS subcategory ( PRIMARY KEY (name), FOREIGN KEY (category)  REFERENCES category(name), name VARCHAR(255) NOT NULL, category VARCHAR(255) NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS subcategory_has_articles ( PRIMARY KEY (subcategory, article),  UNIQUE INDEX uc_article (article ASC), subcategory VARCHAR(255) NOT NULL, article INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS category ( PRIMARY KEY (name), name VARCHAR(255) NOT NULL)",
-		"CREATE TABLE IF NOT EXISTS category_has_subcategories ( PRIMARY KEY (category, subcategory),  UNIQUE INDEX uc_subcategory (subcategory ASC), category INT NOT NULL, subcategory INT NOT NULL)",
+		"CREATE TABLE IF NOT EXISTS category_has_subcategories ( PRIMARY KEY (category, subcategory),  UNIQUE INDEX uc_subcategory (subcategory ASC), category VARCHAR(255) NOT NULL, subcategory VARCHAR(255) NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS order_has_articles ( PRIMARY KEY(`order`, article), `order` INT NOT NULL, article INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS `order` ( PRIMARY KEY (id), FOREIGN KEY (customer)  REFERENCES customer(id), FOREIGN KEY (address)  REFERENCES address(id), id INT AUTO_INCREMENT, customer INT NOT NULL, address INT NOT NULL, status INT(3) NOT NULL,  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE IF NOT EXISTS customer_has_orders ( PRIMARY KEY (`user`, `order`), `user` INT NOT NULL, `order` INT NOT NULL)",

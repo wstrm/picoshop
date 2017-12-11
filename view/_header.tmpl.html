@@ -41,15 +41,13 @@
 		</ul>
 
 		<ul class="vertical-navbar">
-			<li class="category"><a href="#pickles">Pickles</a></li>
-			<li><a href="#">Regular</a></li>
-			<li><a href="#">Slim-fit</a></li>
-			<li><a href="#">Plus-size</a></li>
-			<li class="category"><a href="#cutlery">Cutlery</a></li>
-			<li><a href="#">Dinner</a></li>
-			<li><a href="#">Dessert</a></li>
-			<li><a class="bestseller" href="#">Spork</a></li>
-			<li><a href="#">Couteau de Picleu</a></li>
+			{{ range $category := (context "Categories") }}
+			<li class="category"><a href="/category/{{ $category.Name }}">{{ $category.Name }}</a></li>
+			{{ range $subcategory := $category.Subcategories }}
+			<li><a href="/category/{{ $category.Name }}/{{ $subcategory.Name }}">{{ $subcategory.Name }}</a></li>
+			{{ end }}
+			{{ end }}
+
 			{{ if $admin }}
 			<li class="category"><a href="#">Admin</a></li>
 			<li><a href="/admin">Panel</a></li>

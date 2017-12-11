@@ -23,8 +23,16 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 
 	if id != "" {
 		id64, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
+
 		article, err := model.GetArticleById(id64)
-		log.Println(err)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
 
 		view.Render(request.Context(), writer, "article", view.Page{
 			Title: "Article - Picoshop",

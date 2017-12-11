@@ -1,36 +1,62 @@
 {{ template "header" . }}
 
-<h1>Picoshop</h1>
 <div class = "midbox">
-    <table class="cart">
-        <tr>
-            <th>Articles</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-    {{range $element, $pos := .Data.Cart}}
-        <tr>
-            <td>{{ $element.Article }}</td>
-            <td>{{ $element.Price }}</td>
-            <td>
-                <form action="/cart?{{ $pos }}" method="DELETE">
-                    <button type="submit">REMOVE</button>
-                </form>
-            </td>
-        </tr>
-    {{ end }}
-        <form action="/cart" method="DELETE">
-            <button type="submit">EMPTY CART</button>
-        </form>
-        <tr>
-            <form action="/cart" method="PUT">
-                <input type="Credit card number" id="Credit card number" name="Credit card number" value="{{ .Data.Cart.Number }}">
-                <input type="Expiration date" id="Expiration date" name="Expiration date" value="{{ .Data.Cart.Expiration }}">
-                <input type="CVC" id="CVC" name="CVC" value="{{ .Data.Cart.Cvc }}">
-                <input type="Card holder" id="Cardholder" name="Card holder" value="{{ .Data.Cart.CardHolder }}">
-                <button type="submit">PLACE ORDER</button>
-            </form>
-        </tr>
-    </table>
+	<h1>Your cart</h1>
+	{{ with .Data.Articles }}
+	<table class="cart">
+		<tr>
+			<th>Article</th>
+			<th>Price</th>
+			<th>Operation</th>
+		</tr>
+
+		{{range $element, $pos := . }}
+		<tr>
+			<td>{{ $element.Name }}</td>
+			<td>{{ $element.Price }}</td>
+			<td>
+				<form action="/cart?{{ $pos }}" method="DELETE">
+					<button type="submit">Remove</button>
+				</form>
+			</td>
+		</tr>
+		{{ end }}
+	</table>
+	{{ else }}
+	<h2 class="error">Oh no! Your cart is empty :(</h2>
+	{{ end }}
+
+	<form action="/cart" method="DELETE">
+		<button type="submit">Empty cart</button>
+	</form>
+
+	<tr>
+		<form action="/cart" method="POST">
+			<div>
+				<label for="creditcard">Credit card:</label>
+				<input type="text" id="creditcard" name="creditcard" value="{{ .Data.CreditCard }}">
+			</div>
+
+			<div>
+				<label for="expiration">Expiration date:</label>
+				<input type="date" id="expiration" name="expiration" value="{{ .Data.Expiration }}">
+			</div>
+
+			<div>
+				<label for="cvc">CVC:</label>
+				<input type="text" id="cvc" name="cvc" value="{{ .Data.Cvc }}">
+			</div>
+
+			<div>
+				<label for="cardholder">Card holder</label>
+				<input type="text" id="cardholder" name="cardholder" value="{{ .Data.CardHolder }}">
+			</div>
+
+			<div>
+				<button type="submit">Place order</button>
+			</div>
+		</form>
+	</tr>
 </div>
+
 {{ template "footer" }}
