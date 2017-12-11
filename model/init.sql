@@ -14,18 +14,15 @@ CREATE TABLE IF NOT EXISTS address (
 
 /* Create user_has_address table */
 CREATE TABLE IF NOT EXISTS user_has_address (
-	PRIMARY KEY (id),
-	FOREIGN KEY (address) REFERENCES address(id),
+	PRIMARY KEY (`user`, address),
 
-	id INT AUTO_INCREMENT,
+	`user` INT NOT NULL,
 	address INT NOT NULL);
 
 /* Create user table */
 CREATE TABLE IF NOT EXISTS `user` (
 	PRIMARY KEY (id),
-	FOREIGN KEY (addresses)
-		REFERENCES user_has_address(id)
-		ON DELETE CASCADE,
+	/* TODO(willeponken): Add delete trigger for addresses */
 
 	UNIQUE INDEX uc_email (email ASC),
 
@@ -34,8 +31,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	hash BINARY(60) NOT NULL,
 	name VARCHAR(255) NOT NULL,
 	phone_number VARCHAR(50),
-	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	addresses INT NULL);
+	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create comments table */
 CREATE TABLE IF NOT EXISTS comments (
@@ -49,72 +45,70 @@ CREATE TABLE IF NOT EXISTS comments (
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
 
+/* Create article_has_comments */
+CREATE TABLE IF NOT EXISTS article_has_comments (
+	PRIMARY KEY (article, `comment`),
+
+	article INT NOT NULL,
+	`comment` INT NOT NULL);
+
 /* Create article table */
 CREATE TABLE IF NOT EXISTS article (
 	PRIMARY KEY (id),
-	FOREIGN KEY (comments)
-		REFERENCES comments(id),
+	FOREIGN KEY (category)
+		REFERENCES category(name),
 	FOREIGN KEY (subcategory)
-		REFERENCES subcategory(id),
+		REFERENCES subcategory(name),
 
 	id INT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
 	image_name VARCHAR(255) NOT NULL,
-	subcategory INT NULL,
-	comments INT NULL);
+	category VARCHAR(255) NOT NULL,
+	subcategory VARCHAR(255) NOT NULL);
 
 /* Create subcategory table */
 CREATE TABLE IF NOT EXISTS subcategory (
-	PRIMARY KEY (id),
-	FOREIGN KEY (articles)
-		REFERENCES subcategory_has_articles(id),
+	PRIMARY KEY (name),
 	FOREIGN KEY (category)
-		REFERENCES category(id),
+		REFERENCES category(name),
 
-	id INT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
-	category INT NULL,
-	articles INT NULL);
+	category VARCHAR(255) NOT NULL);
 
 /* Create subcategory_has_articles table */
 CREATE TABLE IF NOT EXISTS subcategory_has_articles (
-	PRIMARY KEY (id),
-	FOREIGN KEY (articles)
-		REFERENCES articles(id),
+	PRIMARY KEY (subcategory, article),
 
-	id INT AUTO_INCREMENT,
-	articles INT NULL);
+	/* articles can never have more than one subcategory */
+	UNIQUE INDEX uc_article (article ASC),
+
+	subcategory VARCHAR(255) NOT NULL,
+	article INT NOT NULL);
 
 /* Create category table */
 CREATE TABLE IF NOT EXISTS category (
-	PRIMARY KEY (id),
-	FOREIGN KEY (categories)
-		REFERENCES category_has_subcategories(id),
+	PRIMARY KEY (name),
 
-	id INT AUTO_INCREMENT,
-	name VARCHAR(255) NOT NULL,
-	categories INT NULL);
+	name VARCHAR(255) NOT NULL);
 
 /* Create category_has_subcategories table */
 CREATE TABLE IF NOT EXISTS category_has_subcategories (
-	PRIMARY KEY (id),
-	FOREIGN KEY (subcategories)
-		REFERENCES subcategory(id),
+	PRIMARY KEY (category, subcategory),
 
-	id INT AUTO_INCREMENT,
-	subcategories INT NULL);
+	/* subcategories can never have more than one category */
+	UNIQUE INDEX uc_subcategory (subcategory ASC),
+
+	category INT NOT NULL,
+	subcategory INT NOT NULL);
 
 /* Create order_has_articles table */
 CREATE TABLE IF NOT EXISTS order_has_articles (
-	PRIMARY KEY(id),
-	FOREIGN KEY(article)
-		REFERENCES article(id),
+	PRIMARY KEY(`order`, article),
 
-	id INT NOT NULL,
-	article INT NOT NULL
-	);
+	`order` INT NOT NULL,
+	article INT NOT NULL);
 
 /* Create order table */
 CREATE TABLE IF NOT EXISTS `order` (
@@ -123,37 +117,29 @@ CREATE TABLE IF NOT EXISTS `order` (
 		REFERENCES customer(id),
 	FOREIGN KEY (address)
 		REFERENCES address(id),
-	FOREIGN KEY (articles)
-		REFERENCES order_has_articles(id),
 
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
 	address INT NOT NULL,
 	status INT(3) NOT NULL, -- status, future proof with 3 long int
-	articles INT NOT NULL,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create user_has_orders table */
 CREATE TABLE IF NOT EXISTS customer_has_orders (
-	PRIMARY KEY (id),
-	FOREIGN KEY (`order`)
-		REFERENCES `order`(id),
+	PRIMARY KEY (`user`, `order`),
 
-	id INT AUTO_INCREMENT,
-	`order` INT NULL);
+	`user` INT NOT NULL,
+	`order` INT NOT NULL);
 
 /* Create customer table */
 CREATE TABLE IF NOT EXISTS customer (
 	PRIMARY KEY (id),
-	FOREIGN KEY (user)
+	FOREIGN KEY (`user`)
 		REFERENCES user(id)
 		ON DELETE CASCADE,
-	FOREIGN KEY (orders)
-		REFERENCES customer_has_orders(id),
 
 	id INT AUTO_INCREMENT,
-	user INT NOT NULL,
-	orders INT NULL);
+	`user` INT NOT NULL);
 
 /* Create admin table */
 CREATE TABLE IF NOT EXISTS admin (

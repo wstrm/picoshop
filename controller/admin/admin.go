@@ -119,8 +119,10 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		name := request.PostFormValue("name")
 		description := request.PostFormValue("description")
 		price := request.PostFormValue("price")
+		category := request.PostFormValue("category")
+		subcategory := request.PostFormValue("subcategory")
 
-		if err := helper.IsFilled(name, description, price); err != nil {
+		if err := helper.IsFilled(name, description, price, category, subcategory); err != nil {
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -131,7 +133,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 
-		article, err := model.PutArticle(model.NewArticle(name, description, u, imageName))
+		article, err := model.PutArticle(model.NewArticle(name, description, u, imageName, category, subcategory))
 		if err != nil {
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
