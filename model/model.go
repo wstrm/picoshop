@@ -412,7 +412,7 @@ func GetAllOrders() (orders []Order, err error) {
 func SearchForArticles(query string) (articles []Article, err error) {
 	rows, err := database.Query(`
 		SELECT id, name, description, price, image_name, category, subcategory
-		FROM .article WHERE name = ?`, query)
+		FROM .article WHERE name  LIKE = %_%?%_%`, query)
 	if err != nil {
 		return
 	}

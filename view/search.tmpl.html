@@ -3,12 +3,14 @@
 <div class = "midbox">
     <table class="search">
         <tr>
+            <th>Image</th>
             <th>Article</th>
             <th>Price</th>
             <th></th>
         </tr>
 	{{range $element := .Data.Articles}}
         <tr>
+            <td>{{ $element.Image}}</td>
             <td>{{ $element.Name }}</td>
             <td>{{ $element.Price }}</td>
             <td></td>
