@@ -1,4 +1,4 @@
-// This file is generated automatically by inlinesql at 2017-12-11 15:08:22.739840949 +0100 CET m=+0.001056910.
+// This file is generated automatically by inlinesql at 2017-12-11 19:57:41.348003546 +0100 CET m=+0.001283579.
 package model
 
 func getQueries() []string {

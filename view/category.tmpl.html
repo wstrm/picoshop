@@ -1,0 +1,21 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+	{{ if (and .Data.Subcategory .Data.Category) }}
+	<h1>Articles in {{ .Data.Category }}/{{ .Data.Subcategory }}</h1>
+	{{ else if .Data.Category }}
+	<h1>Articles in {{ .Data.Category }}</h1>
+	{{ end }}
+	{{ with .Data.Articles }}
+	{{ range . }}
+	<h2>{{ .Name }}</h2>
+	<img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
+	<p>{{ .Description }}</p>
+	<h3>Price: {{ .Price }}</h3>
+	{{ end }}
+	{{ else }}
+	<h2>Oh noes! There are no articles for this category :(</h2>
+	{{ end }}
+    </table>
+</div>
+{{ template "footer" }}

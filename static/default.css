@@ -229,6 +229,7 @@ ul.vertical-navbar li a {
 	display: block;
 	padding: 4px 26px;
 	text-decoration: none;
+	text-transform: capitalize;
 }
 
 ul.vertical-navbar li:hover a {

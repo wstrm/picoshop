@@ -441,6 +441,14 @@ func PutArticle(article Article) (Article, error) {
 	}
 
 	article.Id, err = result.LastInsertId()
+
+	_, err = database.Exec(`
+		INSERT INTO subcategory_has_articles
+		(subcategory, article)
+		VALUES
+		(?, ?)
+	`, &article.Subcategory, &article.Id)
+
 	return article, err
 }
 
@@ -458,11 +466,17 @@ func GetAllCategories() (categories []Category, err error) {
 
 	c := make(map[string][]Subcategory)
 	var k, v string
+	var s []string // save order of map
 
 	for rows.Next() {
 		err = rows.Scan(&k, &v)
 		if err != nil {
 			log.Panicln(err)
+		}
+
+		// do not add key to order slice if already exists
+		if _, exists := c[k]; !exists {
+			s = append(s, k)
 		}
 
 		c[k] = append(c[k], NewSubcategory(v))
@@ -472,10 +486,10 @@ func GetAllCategories() (categories []Category, err error) {
 		return
 	}
 
-	for name, subcategories := range c {
+	for _, name := range s { // range over ordered slice
 		categories = append(categories, Category{
 			Name:          name,
-			Subcategories: subcategories,
+			Subcategories: c[name],
 		})
 	}
 
@@ -492,6 +506,8 @@ func GetSubcategoriesFromCategory(category Category) (subcategories []Subcategor
 
 		INNER JOIN subcategory
 		ON category_has_subcategories.subcategory = subcategory.id
+
+		ORDER BY category.name
 	`, category.Name)
 	if err != nil {
 		return
@@ -550,7 +566,7 @@ func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, er
 
 func GetArticleHighlights(n uint) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT id, name, description, price, image_name
+		SELECT id, name, description, price, image_name, category, subcategory
 		FROM article
 		WHERE rand() <= 0.3
 		LIMIT ?
@@ -565,7 +581,7 @@ func GetArticleHighlights(n uint) (articles []Article, err error) {
 		article := Article{}
 
 		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName)
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -579,11 +595,75 @@ func GetArticleHighlights(n uint) (articles []Article, err error) {
 
 func GetArticleById(id int64) (article Article, err error) {
 	err = database.QueryRow(`
-		SELECT id, name, description, price, image_name
+		SELECT id, name, description, price, image_name, category, subcategory
 		FROM article
 		WHERE id=?
-	`, id).Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName)
+	`, id).Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
 
+	return
+}
+
+func GetArticlesByCategory(category string) (articles []Article, err error) {
+	rows, err := database.Query(`
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory
+		FROM category_has_subcategories c
+		INNER JOIN subcategory_has_articles s
+		ON c.subcategory=s.subcategory
+		INNER JOIN article a
+		ON s.article=a.id
+		WHERE a.category=?
+		ORDER BY a.name
+	`, category)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		articles = append(articles, article)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func GetArticlesBySubcategory(subcategory string) (articles []Article, err error) {
+	rows, err := database.Query(`
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory
+		FROM subcategory_has_articles s
+		INNER JOIN article a
+		ON s.article=a.id
+		WHERE s.subcategory=?
+		ORDER BY a.name
+	`, subcategory)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		article := Article{}
+
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		articles = append(articles, article)
+	}
+
+	err = rows.Err()
 	return
 }
 
@@ -592,7 +672,7 @@ func putCategory(category Category) (Category, error) {
 		INSERT IGNORE INTO category
 		(name)
 		VALUES
-		(?)
+		(TRIM(LOWER(?)))
 	`, category.Name)
 
 	return category, err
@@ -603,7 +683,7 @@ func putSubcategory(subcategory Subcategory) (Subcategory, error) {
 		INSERT IGNORE INTO subcategory
 		(name, category)
 		VALUES
-		(?, ?)
+		(TRIM(LOWER(?)), TRIM(LOWER(?)))
 	`, subcategory.Name, subcategory.Category)
 
 	return subcategory, err
@@ -614,7 +694,7 @@ func addSubcategoryToCategory(category Category, subcategory Subcategory) error 
 		INSERT IGNORE INTO category_has_subcategories
 		(category, subcategory)
 		VALUES
-		(?, ?)
+		(TRIM(LOWER(?)), TRIM(LOWER(?)))
 	`, category.Name, subcategory.Name)
 
 	return err

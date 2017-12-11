@@ -6,6 +6,7 @@ import (
 	"github.com/willeponken/picoshop/controller/admin"
 	"github.com/willeponken/picoshop/controller/article"
 	"github.com/willeponken/picoshop/controller/cart"
+	"github.com/willeponken/picoshop/controller/category"
 	"github.com/willeponken/picoshop/controller/home"
 	"github.com/willeponken/picoshop/controller/login"
 	"github.com/willeponken/picoshop/controller/logout"
@@ -15,7 +16,7 @@ import (
 	"github.com/willeponken/picoshop/controller/user"
 	"github.com/willeponken/picoshop/controller/warehouse"
 	"github.com/willeponken/picoshop/middleware/auth"
-	"github.com/willeponken/picoshop/middleware/category"
+	c "github.com/willeponken/picoshop/middleware/category"
 	"github.com/willeponken/picoshop/model"
 )
 
@@ -74,36 +75,40 @@ func New() *http.ServeMux {
 	adminPolicy := getAdminPolicy()       // A
 	userPolicy := getUserPolicy()         // A, W, C
 
-	mux.Handle("/", category.Middleware(a.Middleware(
+	mux.Handle("/", c.Middleware(a.Middleware(
 		home.NewHandler(), openPolicy)))
 
-	mux.Handle("/login", category.Middleware(a.Middleware(
+	mux.Handle("/login", c.Middleware(a.Middleware(
 		login.NewHandler(a), openPolicy)))
 
-	mux.Handle("/logout", category.Middleware(a.Middleware(
+	mux.Handle("/logout", c.Middleware(a.Middleware(
 		logout.NewHandler(a), openPolicy)))
 
-	mux.Handle("/register", category.Middleware(a.Middleware(
+	mux.Handle("/register", c.Middleware(a.Middleware(
 		register.NewHandler(a), openPolicy)))
 
-	mux.Handle("/user", category.Middleware(a.Middleware(
+	mux.Handle("/user", c.Middleware(a.Middleware(
 		user.NewHandler(), userPolicy)))
 
-	mux.Handle("/article", category.Middleware(a.Middleware(
+	mux.Handle("/article", c.Middleware(a.Middleware(
 		article.NewHandler(), openPolicy)))
 
-	mux.Handle("/cart", category.Middleware(a.Middleware(
+	mux.Handle("/cart", c.Middleware(a.Middleware(
 		cart.NewHandler(), userPolicy)))
 
-	mux.Handle("/admin/", category.Middleware(a.Middleware(
+	mux.Handle("/admin/", c.Middleware(a.Middleware(
 		http.StripPrefix("/admin",
 			admin.NewMux()), adminPolicy)))
 
-	mux.Handle("/warehouse", category.Middleware(a.Middleware(
+	mux.Handle("/warehouse", c.Middleware(a.Middleware(
 		warehouse.NewHandler(), employeePolicy)))
 
-	mux.Handle("/search", category.Middleware(a.Middleware(
+	mux.Handle("/search", c.Middleware(a.Middleware(
 		search.NewHandler(), openPolicy)))
+
+	mux.Handle("/category/", c.Middleware(a.Middleware(
+		http.StripPrefix("/category",
+			category.NewHandler()), openPolicy)))
 
 	mux.Handle("/static/", http.StripPrefix("/static", static.NewHandler()))
 
