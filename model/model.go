@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/willeponken/picoshop/controller/article"
 )
 
 // sql.DB is thread-safe
@@ -78,6 +79,12 @@ type Subcategory struct {
 	Name     string
 	Category string
 	Articles []Article
+}
+
+type Comment struct {
+	Id      int64
+	Text    string
+	User	int64
 }
 
 //go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f init.sql -p model -o sql.go
@@ -624,4 +631,18 @@ func ensureSubcategoryWithCategory(category Category, subcategory Subcategory) {
 	if err != nil {
 		log.Panicln(err)
 	}
+}
+
+func updateUser(user User)(error){
+	_, err := database.Exec(`
+		UPDATE user SET Name, Email, PhoneNumber
+		(?, ?, ?)`, &user.Name, &user.Email, &user.PhoneNumber)
+	return err
+}
+
+func addComment(comment Comment)(error) {
+	_, err := database.Exec(`
+		INSERT INTO comments
+		(?, ?)`, &comment.Text, &comment.User)
+	return err
 }

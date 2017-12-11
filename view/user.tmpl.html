@@ -4,7 +4,7 @@
 <p>Welcome to your profile!</p>
         <div class="midbox">
             <table>
-                <form action="/user">
+                <form action="/user" method="post">
                     <input type="Name" id="Name" name="Name" value="{{ .Data.User.Name }}">
                     <input type="E-mail" id="E-mail" name="E-mail" value="{{ .Data.User.Email }}">
                     <input type="Phone number" id="Phone number" name="Phone number" value="{{ .Data.User.PhoneNumber }}" >
