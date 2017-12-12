@@ -8,10 +8,12 @@
 	{{ end }}
 	{{ with .Data.Articles }}
 	{{ range . }}
-	<h2>{{ .Name }}</h2>
-	<img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
-	<p>{{ .Description }}</p>
-	<h3>Price: {{ .Price }}</h3>
+	<a href="/article?id={{ .Id }}">
+		<h2>{{ .Name }}</h2>
+		<img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
+		<p>{{ .Description }}</p>
+		<h3>Price: {{ .Price }}</h3>
+	</a>
 	{{ end }}
 	{{ else }}
 	<h2>Oh noes! There are no articles for this category :(</h2>

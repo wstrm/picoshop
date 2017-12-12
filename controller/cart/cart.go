@@ -17,17 +17,22 @@ type cartHandler struct {
 	http.Handler
 }
 
-type cartData struct {
-	Error      string
-	CreditCard string
+type creditCard struct {
+	Number     string
 	Expiration string
 	Cvc        string
-	CardHolder string
-	Articles   []model.Article
+	Holder     string
+}
+
+type cartData struct {
+	Error      string
+	CreditCard creditCard
+	Cart       model.Cart
+	Address    model.Address
 }
 
 func getCustomerFromCtx(ctx context.Context) (customer model.Customer, err error) {
-	v := ctx.Value("customer")
+	v := ctx.Value("Customer")
 	if v == nil {
 		err = errors.New("no customer in context")
 		return
@@ -54,7 +59,16 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	switch request.Method {
+	// Because the HTML standard sucks, we fake it till we make it
+	method := request.Method
+	switch request.FormValue("_method") {
+	case http.MethodPut:
+		method = http.MethodPut
+	case http.MethodDelete:
+		method = http.MethodDelete
+	}
+
+	switch method {
 	case http.MethodGet: // View cart
 		view.Render(request.Context(), writer, "cart", view.Page{
 			Title: "Picoshop",
@@ -62,7 +76,7 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		})
 
 	case http.MethodPut: // Add article to cart
-		id := request.URL.Query().Get("id")
+		id := request.FormValue("article")
 		if err := helper.IsFilled(id); err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -83,14 +97,26 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 			return
 		}
 
-		http.Error(writer, "Done", http.StatusNotImplemented)
+		cart, err := model.GetCart(customer.Id)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 
-	case http.MethodPost: // Order items in cart
+		view.Render(request.Context(), writer, "cart", view.Page{
+			Title: "Picoshop",
+			Data: cartData{
+				Cart: cart,
+			},
+		})
+
+	case http.MethodPost: // Order cart
 		http.Error(writer, "", http.StatusNotImplemented)
 
 	case http.MethodDelete:
-		pos := request.URL.Query().Get("pos")
-		if pos != "" {
+		article := request.FormValue("article")
+		if article != "" {
 			// Delete specific item
 		} else {
 			// Delete whole cart

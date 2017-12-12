@@ -125,7 +125,6 @@ CREATE TABLE IF NOT EXISTS `order` (
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create cart table */
-C
 CREATE TABLE IF NOT EXISTS cart (
 	PRIMARY KEY (customer, article),
 

@@ -2,23 +2,28 @@
 
 <div class = "midbox">
 	<h1>Your cart</h1>
-	{{ with .Data.Articles }}
+	{{ with .Data.Cart.Items }}
 	<table class="cart">
 		<tr>
 			<th>Article</th>
 			<th>Price</th>
+			<th>Quantity</th>
 			<th>Operation</th>
 		</tr>
 
-		{{range $element, $pos := . }}
+		{{range $i := . }}
 		<tr>
-			<td>{{ $element.Name }}</td>
-			<td>{{ $element.Price }}</td>
+			{{ with $i.Article }}
+			<td>{{ .Name }}</td>
+			<td>{{ .Price }}</td>
+			<td>{{ $i.Quantity }}</td>
 			<td>
-				<form action="/cart?{{ $pos }}" method="DELETE">
+				<form action="/cart?{{ .Id }}" method="DELETE">
+					<input type="hidden" name="_method" value="DELETE">
 					<button type="submit">Remove</button>
 				</form>
 			</td>
+			{{ end }}
 		</tr>
 		{{ end }}
 	</table>
@@ -27,6 +32,7 @@
 	{{ end }}
 
 	<form action="/cart" method="DELETE">
+		<input type="hidden" name="_method" value="DELETE">
 		<button type="submit">Empty cart</button>
 	</form>
 
@@ -34,42 +40,42 @@
 		<form action="/cart" method="POST">
 			<div>
 				<label for="creditcard">Credit card:</label>
-				<input type="text" id="creditcard" name="creditcard" value="{{ .Data.CreditCard }}">
+				<input type="text" id="creditcard" name="creditcard" value="{{ .Data.CreditCard.Number }}">
 			</div>
 
 			<div>
 				<label for="expiration">Expiration date:</label>
-				<input type="date" id="expiration" name="expiration" value="{{ .Data.Expiration }}">
+				<input type="date" id="expiration" name="expiration" value="{{ .Data.CreditCard.Expiration }}">
 			</div>
 
 			<div>
 				<label for="cvc">CVC:</label>
-				<input type="text" id="cvc" name="cvc" value="{{ .Data.Cvc }}">
+				<input type="text" id="cvc" name="cvc" value="{{ .Data.CreditCard.Cvc }}">
 			</div>
 
 			<div>
 				<label for="cardholder">Card holder:</label>
-				<input type="text" id="cardholder" name="cardholder" value="{{ .Data.CardHolder }}">
+				<input type="text" id="cardholder" name="cardholder" value="{{ .Data.CreditCard.Holder }}">
 			</div>
 
 			<div>
 				<label for="street">Street:</label>
-				<input type="text" id="street" name="street" value="{{ .Data.Street }}">
+				<input type="text" id="street" name="street" value="{{ .Data.Address.Street }}">
 			</div>
 
 			<div>
 				<label for="careof">C/O:</label>
-				<input type="text" id="careof" name="careof" value="{{ .Data.CareOf }}">
+				<input type="text" id="careof" name="careof" value="{{ .Data.Address.CareOf }}">
 			</div>
 
 			<div>
 				<label for="zipcode">Zip code:</label>
-				<input type="text" id="zipcode" name="zipcode" value="{{ .Data.ZipCode }}">
+				<input type="text" id="zipcode" name="zipcode" value="{{ .Data.Address.ZipCode }}">
 			</div>
 
 			<div>
 				<label for="country">Country:</label>
-				<input type="text" id="country" name="country" value="{{ .Data.Country }}">
+				<input type="text" id="country" name="country" value="{{ .Data.Address.Country }}">
 			</div>
 
 			<div>

@@ -50,17 +50,16 @@ func newCartItem(quantity int, article Article) CartItem {
 	}
 }
 
-func GetCart(customer Customer) (cart Cart, err error) {
+func GetCart(customerId int64) (cart Cart, err error) {
 	rows, err := database.Query(`
-		SELECT (a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory,
-			c.quantity)
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, c.quantity
 		FROM cart c
 
 		INNER JOIN article a
 		ON c.article = a.id
 
 		WHERE c.customer = ?
-	`, customer.Id)
+	`, customerId)
 	if err != nil {
 		return
 	}

@@ -7,6 +7,12 @@
 	<p>{{ .Description }}</p>
 	<h3>Price: {{ .Price }}</h3>
 
+	<form action="/cart?article={{ .Id }}" method="PUT">
+		<input type="hidden" name="_method" value="PUT">
+		<input type="hidden" name="article" value="{{ .Id }}">
+		<button type="submit">Add to cart</button>
+	</form>
+
 	<h2>Comment</h2>
 	<form action="/article?id={{ .Id }}" method="POST">
             <input type="comment" id="comment" name="comment">
