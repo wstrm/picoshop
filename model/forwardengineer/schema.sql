@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS address (
 	zip_code INT(11) NOT NULL,
 	country VARCHAR(255) NOT NULL);
 
-/* Create user_has_address table */
-CREATE TABLE IF NOT EXISTS user_has_address (
+/* Create user_has_addresses table */
+CREATE TABLE IF NOT EXISTS user_has_addresses (
 	PRIMARY KEY (`user`, address),
 
 	`user` INT NOT NULL,

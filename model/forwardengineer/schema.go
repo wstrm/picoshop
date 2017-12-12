@@ -1,13 +1,13 @@
-// This file is generated automatically by inlinesql at 2017-12-11 19:57:41.348003546 +0100 CET m=+0.001283579.
-package model
+// This file is generated automatically by inlinesql at 2017-12-12 14:23:47.40763413 +0100 CET m=+0.001040157.
+package forwardengineer
 
-func getQueries() []string {
+func GetQueries() []string {
 	return []string{
 		"SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0",
 		"SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0",
 		"SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES'",
 		"CREATE TABLE IF NOT EXISTS address ( PRIMARY KEY (id), id INT AUTO_INCREMENT, street VARCHAR(255) NOT NULL, care_of VARCHAR(255) NULL, zip_code INT(11) NOT NULL, country VARCHAR(255) NOT NULL)",
-		"CREATE TABLE IF NOT EXISTS user_has_address ( PRIMARY KEY (`user`, address), `user` INT NOT NULL, address INT NOT NULL)",
+		"CREATE TABLE IF NOT EXISTS user_has_addresses ( PRIMARY KEY (`user`, address), `user` INT NOT NULL, address INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS `user` ( PRIMARY KEY (id),  UNIQUE INDEX uc_email (email ASC), id INT AUTO_INCREMENT, email VARCHAR(255) NOT NULL, hash BINARY(60) NOT NULL, name VARCHAR(255) NOT NULL, phone_number VARCHAR(50), create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE IF NOT EXISTS comments ( PRIMARY KEY (id), FOREIGN KEY (customer)  REFERENCES customer(id), id INT NOT NULL, rating DECIMAL(10, 0) NOT NULL,  text VARCHAR(255), create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, customer INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS article_has_comments ( PRIMARY KEY (article, `comment`), article INT NOT NULL, `comment` INT NOT NULL)",

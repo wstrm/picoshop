@@ -59,7 +59,7 @@ var pkgTmpl = template.Must(template.New("").Parse(
 	`// This file is generated automatically by inlinesql at {{ .Timestamp }}.
 package {{ .Package }}
 
-func getQueries() []string {
+func GetQueries() []string {
 	return []string{
 		{{- range .Queries }}
 		{{ printf "%q" . }},
