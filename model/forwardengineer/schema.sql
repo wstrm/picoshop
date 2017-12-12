@@ -124,6 +124,15 @@ CREATE TABLE IF NOT EXISTS `order` (
 	status INT(3) NOT NULL, -- status, future proof with 3 long int
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
+/* Create cart table */
+C
+CREATE TABLE IF NOT EXISTS cart (
+	PRIMARY KEY (customer, article),
+
+	customer INT NOT NULL,
+	article INT NOT NULL,
+	quantity INT NOT NULL);
+
 /* Create user_has_orders table */
 CREATE TABLE IF NOT EXISTS customer_has_orders (
 	PRIMARY KEY (`user`, `order`),

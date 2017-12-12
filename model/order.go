@@ -5,20 +5,21 @@ import (
 	"time"
 )
 
-type Order struct {
-	Id         int64
-	Customer   int64
-	Address    int64
-	Status     int8
-	CreateTime time.Time
-}
-
 type Address struct {
 	Id      int64
 	Street  string
 	CareOf  string
 	ZipCode string
 	Country string
+}
+
+type Order struct {
+	Id         int64
+	Customer   int64
+	Address    Address
+	Status     int8
+	Articles   []Article
+	CreateTime time.Time
 }
 
 func GetAllOrders() (orders []Order, err error) {
@@ -34,6 +35,7 @@ func GetAllOrders() (orders []Order, err error) {
 	for rows.Next() {
 		order := Order{}
 
+		// TODO(willeponken): get articles from id in order_has_articles
 		err = rows.Scan(
 			&order.Customer, &order.Address, &order.Articles,
 			&order.Status, &order.CreateTime)
@@ -47,3 +49,13 @@ func GetAllOrders() (orders []Order, err error) {
 	err = rows.Err()
 	return
 }
+
+/*
+func GetOrdersByUserId(id int64) (order []Order, err error) {
+	row, err := database.QueryRow(`
+		SELECT id, customer, address, status, create_time
+		FROM .order
+		WHERE
+	`)
+}
+*/
