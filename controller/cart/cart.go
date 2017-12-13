@@ -115,7 +115,27 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		renderCart(writer, request, customer.Id)
 
 	case http.MethodPost: // Order cart
-		http.Error(writer, "", http.StatusNotImplemented)
+		address := model.Address{
+			Street:  request.FormValue("street"),
+			CareOf:  request.FormValue("care_of"),
+			ZipCode: request.FormValue("zip_code"),
+			Country: request.FormValue("country"),
+		}
+
+		err := helper.IsFilled(address.Street, address.CareOf, address.ZipCode, address.Country)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		if err := model.OrderCart(customer.Id, address); err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(writer, request, "/", http.StatusSeeOther)
 
 	case http.MethodDelete:
 		article := request.FormValue("article")

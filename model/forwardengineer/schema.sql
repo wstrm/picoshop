@@ -108,7 +108,8 @@ CREATE TABLE IF NOT EXISTS order_has_articles (
 	PRIMARY KEY(`order`, article),
 
 	`order` INT NOT NULL,
-	article INT NOT NULL);
+	article INT NOT NULL,
+	quantity INT NOT NULL);
 
 /* Create order table */
 CREATE TABLE IF NOT EXISTS `order` (

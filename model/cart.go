@@ -117,3 +117,68 @@ func GetCart(customerId int64) (cart Cart, err error) {
 	err = rows.Err()
 	return
 }
+
+func OrderCart(customerId int64, address Address) (err error) {
+	tx, err := database.Begin()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	addressResult, err := tx.Exec(`
+		INSERT INTO address
+		(street, care_of, zip_code, country)
+		VALUES
+		(?, ?, ?, ?)
+	`, &address.Street, &address.CareOf, &address.ZipCode, &address.Country)
+	if err != nil {
+		return
+	}
+
+	addressId, err := addressResult.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	orderResult, err := tx.Exec(`
+		INSERT INTO .order
+		(customer, address)
+		VALUES
+		(?, ?)
+	`, &customerId, &addressId)
+	if err != nil {
+		return
+	}
+
+	orderId, err := orderResult.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	_, err = tx.Exec(`
+		INSERT INTO order_has_articles
+		(order_has_articles.order, order_has_articles.article, order_has_articles.quantity)
+		SELECT ?, cart.article, cart.quantity
+		FROM cart
+		WHERE cart.customer = ?
+	`, &orderId, &customerId)
+	if err != nil {
+		return
+	}
+
+	_, err = tx.Exec(`
+		DELETE FROM cart
+		WHERE customer = ?
+	`, &customerId)
+	if err != nil {
+		return
+	}
+
+	return
+}
