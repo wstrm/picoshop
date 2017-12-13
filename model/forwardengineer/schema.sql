@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
 	address INT NOT NULL,
-	status BIT(2) NOT NULL DEFAULT 0,-- status, future proof designated by two bits
+	status INT NOT NULL DEFAULT 0,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create cart table */

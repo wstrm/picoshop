@@ -11,7 +11,7 @@
 	{{range $element := .Data.Orders}}
             <tr>
                  <td>{{ $element.Id }}</td>
-                 <td>{{ $element.OrderArticles }}</td>
+                 <td>{{ $element.Item }}</td>
                  <td>{{ $element.Address }}</td>
                  <td>
                      <form action="/order?id={{ $element.Id }}" method="PUT">

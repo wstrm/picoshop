@@ -13,40 +13,110 @@ type Address struct {
 	Country string
 }
 
+type OrderItem struct {
+	Article  Article
+	Quantity int
+}
+
 type Order struct {
 	Id         int64
 	Customer   int64
 	Address    Address
-	Status     int8
-	Articles   []Article
+	Status     int64
+	Items      []OrderItem
 	CreateTime time.Time
 }
 
+func newOrderItem(quantity int, article Article) OrderItem {
+	return OrderItem{
+		Quantity: quantity,
+		Article:  article,
+	}
+}
+
 func GetAllOrders() (orders []Order, err error) {
-	rows, err := database.Query(`
-		SELECT customer, address, articles, status, create_time
-		FROM .order`)
+	tx, err := database.Begin()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	orderRows, err := tx.Query(`
+		SELECT 	o.id, o.customer, o.status, o.create_time,
+			a.street, a.care_of, a.zip_code, a.country
+		FROM .order o
+		
+		INNER JOIN address a
+		ON a.id = o.address
+		`)
 	if err != nil {
 		return
 	}
 
-	defer rows.Close()
+	var order Order
 
-	for rows.Next() {
-		order := Order{}
+	for orderRows.Next() {
+		order = Order{}
 
-		// TODO(willeponken): get articles from id in order_has_articles
-		err = rows.Scan(
-			&order.Customer, &order.Address, &order.Articles,
-			&order.Status, &order.CreateTime)
+		err = orderRows.Scan(&order.Id, &order.Customer, &order.Status, &order.CreateTime,
+			&order.Address.Street, &order.Address.CareOf, &order.Address.ZipCode,
+			&order.Address.Country)
 		if err != nil {
 			log.Panicln(err)
 		}
 
 		orders = append(orders, order)
 	}
+	err = orderRows.Err()
+	if err != nil {
+		return
+	}
+	orderRows.Close()
 
-	err = rows.Err()
+	articlesStmt, err := tx.Prepare(`
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, o.quantity
+		FROM order_has_articles o
+
+		INNER JOIN article a
+		ON o.article = a.id
+
+		WHERE o.order = ?
+	`)
+
+	for _, order = range orders {
+		articleRows, err := articlesStmt.Query(&order.Id)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		var quantity int
+		var article Article
+		for articleRows.Next() {
+			err = articleRows.Scan(
+				&article.Id, &article.Name, &article.Description, &article.Price,
+				&article.ImageName, &article.Category, &article.Subcategory, &quantity)
+			if err != nil {
+				log.Panicln(err)
+			}
+
+			order.Items = append(order.Items, newOrderItem(quantity, article))
+		}
+
+		err = articleRows.Err()
+		articleRows.Close()
+		articlesStmt.Close()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return
 }
 
