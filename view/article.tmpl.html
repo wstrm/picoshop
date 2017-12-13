@@ -7,10 +7,14 @@
 	<p>{{ .Description }}</p>
 	<h3>Price: {{ .Price }}</h3>
 	<h3>Comments</h3>
+	<table>
 	{{ range $element := $.Data.Comments }}
-		<td>{{ $element.Text}}</td>
+		<tr>
+			<td>{{ $element.Customer }}</td>
+			<td>{{ $element.Text}}</td>
+		</tr>
 	{{ end }}
-
+	</table>
 	{{ if (context "Customer") }}
 	<form action="/cart?article={{ .Id }}" method="PUT">
 		<input type="hidden" name="_method" value="PUT">
