@@ -35,6 +35,29 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 
+		switch request.Method {
+		case http.MethodGet: // Just render page
+		case http.MethodPost: // Add comment
+			customer, ok := request.Context().Value("Customer").(model.Customer)
+			if !ok {
+				http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+
+			text := request.FormValue("text")
+			if text != "" {
+				err := model.AddComment(id64, model.Comment{
+					Text:     text,
+					Customer: customer.Id,
+				})
+				if err != nil {
+					log.Println(err)
+					http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+					return
+				}
+			}
+		}
+
 		comments, err := model.GetCommentsByArticleId(id64)
 		if err != nil {
 			log.Println(err)

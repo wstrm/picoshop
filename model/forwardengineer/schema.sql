@@ -34,17 +34,17 @@ CREATE TABLE IF NOT EXISTS `user` (
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create comments table */
-CREATE TABLE IF NOT EXISTS comments (
+CREATE TABLE IF NOT EXISTS `comment` (
 	PRIMARY KEY (id),
 	FOREIGN KEY (customer)
 		REFERENCES customer(id),
 	FOREIGN KEY (article)
 		REFERENCES article(id),
 
-	id INT NOT NULL,
+	id INT AUTO_INCREMENT,
 	article INT NOT NULL,
-	rating DECIMAL(10, 0) NOT NULL, -- rating between 0-10 stars
-	text VARCHAR(255),
+	rating DECIMAL(10, 0), -- rating between 0-10 stars
+	text VARCHAR(255) NOT NULL,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
 
