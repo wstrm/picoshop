@@ -10,6 +10,7 @@
 	<table>
 	{{ range $element := $.Data.Comments }}
 		<tr>
+			<td>{{ $element.Customer }}</td>
 			<td>{{ $element.Text}}</td>
 		</tr>
 	{{ end }}
