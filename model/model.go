@@ -11,8 +11,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/willeponken/picoshop/controller/warehouse"
-	"github.com/willeponken/picoshop/controller/article"
 )
 
 // sql.DB is thread-safe

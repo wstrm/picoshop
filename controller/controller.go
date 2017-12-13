@@ -69,7 +69,7 @@ func New() *http.ServeMux {
 	a := auth.NewManager("auth", model.Admin{}, model.Customer{}, model.Warehouse{})
 
 	employeePolicy := getEmployeePolicy() // A, W
-	openPolicy := getOpenPolicy()         // A, W, C, *
+	openPolicy := getOpenPolicy()         // *
 	adminPolicy := getAdminPolicy()       // A
 	userPolicy := getUserPolicy()         // A, W, C
 

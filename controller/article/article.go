@@ -26,7 +26,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 	if id != "" {
 		id64, err := strconv.ParseInt(id, 10, 64)
 		article, err := model.GetArticleById(id64)
-		comments, err := model.GetCommentsByArticleId(id)
+		comments, err := model.GetCommentsByArticleId(id64)
 		log.Println(err)
 
 		view.Render(request.Context(), writer, "article", view.Page{
