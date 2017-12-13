@@ -35,6 +35,12 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		}
 
+		comments, err := model.GetCommentsByArticleId(id64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+
 		view.Render(request.Context(), writer, "article", view.Page{
 			Title: "Article - Picoshop",
 			Data: articleData{

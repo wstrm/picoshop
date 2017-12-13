@@ -50,6 +50,13 @@ func GetAllOrders() (orders []Order, err error) {
 	return
 }
 
+func SetOrderStatus(id int64, status int) error {
+	_, err := database.Exec(`
+		UPDATE .order SET status = ? WHERE id=?
+		`, &status, &id)
+	return err
+}
+
 /*
 func GetOrdersByUserId(id int64) (order []Order, err error) {
 	row, err := database.QueryRow(`
