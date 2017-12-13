@@ -14,7 +14,7 @@
   {{ range . }}
   <a href="/article?id={{ .Id }}">
 	  <h3>{{ .Name }}</h3>
-	  <img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
+	  <img class="article" src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
 	  <p><em>Only {{ .Price }}!</em></p>
   </a>
   {{ end }}
