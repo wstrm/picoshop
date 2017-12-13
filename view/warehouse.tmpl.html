@@ -1,33 +1,78 @@
 {{ template "header" . }}
 
 <div class = "midbox">
-    <table class="warehouse">
-        <tr>
-            <th>Order ID</th>
-            <th>Articles</th>
-            <th>Address</th>
-            <th></th>
-        </tr>
-	{{range $element := .Data.Orders}}
-            <tr>
-                 <td>{{ $element.Id }}</td>
-                 <td>{{ $element.Item }}</td>
-                 <td>{{ $element.Address }}</td>
-                 <td>
-                     <form action="/order?id={{ $element.Id }}" method="PUT">
-                         <input type="hidden" name="_method" value="PUT">
-                         <button type="submit">ACCEPT ORDER</button>
-                     </form>
-                     <form action="/order?id={{ $element.Id }}" method="POST">
-                         <input type="hidden" name="_method" value="POST">
-                         <button type="submit">SHIP ORDER</button>
-                     </form>
-                     <form action="/order?id={{ $element.Id }}" method="DELETE">
-                        <button type="submit">END ORDER</button>
-                     </form>
-                 </td>
-             </tr>
-	     {{ end }}
-    </table>
+	<h1>Current orders</h1>
+
+	{{ range $order := .Data.Orders }}
+	<div class="order">
+		{{ with $order }}
+		<h2>Order #{{ .Id }}</h2>
+		<table>
+			<tr>
+				<th>Customer:</th>
+				<td>{{ .Customer }}</td>
+			</tr>
+			<tr>
+				<th>Status:</th>
+				<td>{{ .Status }}</td>
+			</tr>
+			{{ with .Address }}
+			<tr>
+				<th>Street:</th>
+				<td>{{ .Street }}</td>
+			</tr>
+			<tr>
+				<th>C/O:</th>
+				<td>{{ .CareOf }}</td>
+			</tr>
+			<tr>
+				<th>Zip code:</th>
+				<td>{{ .ZipCode }}</td>
+			</tr>
+			<tr>
+				<th>Country:</th>
+				<td>{{ .Country }}</td>
+			</tr>
+			{{ end }}
+		</table>
+
+		<h3>Articles</h3>
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Quantity</th>
+			</tr>
+			{{ range $item := .Items }}
+			<tr>
+				{{ with $item.Article }}
+				<td>{{ .Id }}</td>
+				<td>{{ .Name }}</td>
+				{{ end }}
+				{{ with $item.Quantity }}
+				<td>{{ . }}</td>
+				{{ end }}
+			</tr>
+			{{ end }}
+		</table>
+
+		<form action="/warehouse/order?id={{ .Id }}" method="PUT">
+			<input type="hidden" name="id" value="{{ .Id }}">
+			<input type="hidden" name="_method" value="PUT">
+			<button type="submit">Accept</button>
+		</form>
+		<form action="/warehouse/order?id={{ .Id }}" method="POST">
+			<input type="hidden" name="id" value="{{ .Id }}">
+			<button type="submit">Ship</button>
+		</form>
+		<form action="/warehouse/order?id={{ .Id }}" method="DELETE">
+			<input type="hidden" name="id" value="{{ .Id }}">
+			<input type="hidden" name="_method" value="DELETE">
+			<button type="submit">End</button>
+		</form>
+		{{ end }}
+	</div>
+	{{ end }}
 </div>
+
 {{ template "footer" }}

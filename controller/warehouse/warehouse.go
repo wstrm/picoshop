@@ -11,11 +11,15 @@ import (
 	"github.com/willeponken/picoshop/view"
 )
 
-type warehouseHandler struct {
+type rootHandler struct {
 	http.Handler
 }
 
-type warehouseData struct {
+type orderHandler struct {
+	http.Handler
+}
+
+type rootData struct {
 	Error  string
 	Orders []model.Order
 }
@@ -27,33 +31,71 @@ const (
 	end
 )
 
-func (a *warehouseHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func newRootHandler() *rootHandler {
+	return &rootHandler{}
+}
+
+func newOrderHandler() *orderHandler {
+	return &orderHandler{}
+}
+
+func (r *rootHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	orders, err := model.GetAllOrders()
 	if err != nil {
 		log.Panicln(err)
 	}
 
 	switch request.Method {
-	case http.MethodGet: //view warehouse orders
+	case http.MethodGet: // View warehouse orders
+		view.Render(request.Context(), writer, "warehouse", view.Page{
+			Title: "Warehouse - Picoshop",
+			Data: rootData{
+				Orders: orders,
+			},
+		})
+	default:
+		http.Error(writer, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
+}
 
+func (o *orderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	// Because the HTML standard sucks, we fake it till we make it
+	method := request.Method
+	switch request.FormValue("_method") {
+	case http.MethodPut:
+		method = http.MethodPut
+	case http.MethodDelete:
+		method = http.MethodDelete
+	}
+
+	id, err := strconv.ParseInt(request.FormValue("id"), 10, 64)
+	if err != nil {
+		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	switch method {
 	case http.MethodPost:
-		id, _ := strconv.ParseInt(request.FormValue("id"), 10, 64)
 		model.SetOrderStatus(id, shipped)
 
 	case http.MethodPut:
-		id, _ := strconv.ParseInt(request.FormValue("id"), 10, 64)
 		model.SetOrderStatus(id, accepted)
 
 	case http.MethodDelete:
-		id, _ := strconv.ParseInt(request.FormValue("id"), 10, 64)
 		model.SetOrderStatus(id, end)
+	default:
+		http.Error(writer, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
 	}
 
-	view.Render(request.Context(), writer, "warehouse", view.Page{Title: "Warehouse - Picoshop", Data: warehouseData{
-		Orders: orders,
-	}})
+	http.Redirect(writer, request, "/warehouse", http.StatusSeeOther)
 }
 
-func NewHandler() *warehouseHandler {
-	return &warehouseHandler{}
+func NewMux() *http.ServeMux {
+	mux := http.NewServeMux()
+
+	mux.Handle("/", newRootHandler())
+	mux.Handle("/order", newOrderHandler())
+
+	return mux
 }

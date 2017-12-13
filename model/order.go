@@ -89,8 +89,8 @@ func GetAllOrders() (orders []Order, err error) {
 		WHERE o.order = ?
 	`)
 
-	for _, order = range orders {
-		articleRows, err := articlesStmt.Query(&order.Id)
+	for i, _ := range orders {
+		articleRows, err := articlesStmt.Query(&orders[i].Id)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -105,7 +105,7 @@ func GetAllOrders() (orders []Order, err error) {
 				log.Panicln(err)
 			}
 
-			order.Items = append(order.Items, newOrderItem(quantity, article))
+			orders[i].Items = append(orders[i].Items, newOrderItem(quantity, article))
 		}
 
 		err = articleRows.Err()

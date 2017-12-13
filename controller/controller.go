@@ -100,8 +100,9 @@ func New() *http.ServeMux {
 		http.StripPrefix("/admin",
 			admin.NewMux()), adminPolicy)))
 
-	mux.Handle("/warehouse", c.Middleware(a.Middleware(
-		warehouse.NewHandler(), employeePolicy)))
+	mux.Handle("/warehouse/", c.Middleware(a.Middleware(
+		http.StripPrefix("/warehouse",
+			warehouse.NewMux()), employeePolicy)))
 
 	mux.Handle("/search", c.Middleware(a.Middleware(
 		search.NewHandler(), openPolicy)))
