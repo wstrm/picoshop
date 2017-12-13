@@ -36,21 +36,16 @@ CREATE TABLE IF NOT EXISTS `user` (
 /* Create comments table */
 CREATE TABLE IF NOT EXISTS comments (
 	PRIMARY KEY (id),
-	FOREIGN KEY (customer)
-		REFERENCES customer(id),
+	FOREIGN KEY (customer, article)
+		REFERENCES (customer(id), article(id))
 
 	id INT NOT NULL,
+	article INT NOT NULL,
 	rating DECIMAL(10, 0) NOT NULL, -- rating between 0-10 stars
 	text VARCHAR(255),
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
 
-/* Create article_has_comments */
-CREATE TABLE IF NOT EXISTS article_has_comments (
-	PRIMARY KEY (article, `comment`),
-
-	article INT NOT NULL,
-	`comment` INT NOT NULL);
 
 /* Create article table */
 CREATE TABLE IF NOT EXISTS article (

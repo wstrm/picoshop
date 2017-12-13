@@ -12,6 +12,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/willeponken/picoshop/controller/warehouse"
+	"github.com/willeponken/picoshop/controller/article"
 )
 
 // sql.DB is thread-safe
@@ -652,4 +653,29 @@ func SetOrderStatus(id int64, status int)(error) {
 		UPDATE .order SET status = ? WHERE id=?
 		`, &status, &id)
 	return err
+}
+
+func GetCommentsByArticleId(id int64)(comments []Comment, err error) {
+	rows, err := database.Query(`
+		SELECT text FROM comments WHERE comments.article = (?)`, &id)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		comment := Comment{}
+
+		err = rows.Scan(
+			&comment.Text)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		comments = append(comments, comment)
+	}
+
+	err = rows.Err()
+	return
 }
