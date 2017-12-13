@@ -26,7 +26,7 @@ func NewArticle(name, description string, price float64, imageName string, categ
 func SearchForArticles(query string) (articles []Article, err error) {
 	rows, err := database.Query(`
 		SELECT id, name, description, price, image_name, category, subcategory
-		FROM .article WHERE name = ?`, query)
+		FROM article WHERE name LIKE ?`, "%"+query+"%")
 	if err != nil {
 		return
 	}

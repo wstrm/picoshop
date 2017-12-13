@@ -36,8 +36,10 @@ CREATE TABLE IF NOT EXISTS `user` (
 /* Create comments table */
 CREATE TABLE IF NOT EXISTS comments (
 	PRIMARY KEY (id),
-	FOREIGN KEY (customer, article)
-		REFERENCES (customer(id), article(id))
+	FOREIGN KEY (customer)
+		REFERENCES customer(id),
+	FOREIGN KEY (article)
+		REFERENCES article(id),
 
 	id INT NOT NULL,
 	article INT NOT NULL,
@@ -117,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
 	address INT NOT NULL,
-	status BIT(2) NOT NULL, DEFAULT 0,-- status, future proof designated by two bits
+	status BIT(2) NOT NULL DEFAULT 0,-- status, future proof designated by two bits
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create cart table */
