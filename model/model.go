@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/willeponken/picoshop/controller/article"
+	"github.com/willeponken/picoshop/controller/warehouse"
 )
 
 // sql.DB is thread-safe
@@ -292,7 +292,7 @@ func GetUserByEmail(email string) (user User, err error) {
 
 func PutUser(user User) (User, error) {
 	result, err := database.Exec(`
-		INSERT INTO user 
+		INSERT INTO .user
 			(email, 	name, 	hash, 	phone_number, 	create_time)
 			VALUES
 			(LOWER(TRIM(?)), 	?,	?, 	?,		?)
@@ -635,7 +635,7 @@ func ensureSubcategoryWithCategory(category Category, subcategory Subcategory) {
 
 func updateUser(user User)(error){
 	_, err := database.Exec(`
-		UPDATE user SET Name, Email, PhoneNumber
+		UPDATE .user SET Name, Email, PhoneNumber
 		(?, ?, ?)`, &user.Name, &user.Email, &user.PhoneNumber)
 	return err
 }
@@ -644,5 +644,12 @@ func addComment(comment Comment)(error) {
 	_, err := database.Exec(`
 		INSERT INTO comments
 		(?, ?)`, &comment.Text, &comment.User)
+	return err
+}
+
+func SetOrderStatus(id int64, status int)(error) {
+	_, err := database.Exec(`
+		UPDATE .order SET status = ? WHERE id=?
+		`, &status, &id)
 	return err
 }

@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
 	address INT NOT NULL,
-	status BIT(2) NOT NULL, -- status, future proof designated by two bits
+	status BIT(2) NOT NULL, DEFAULT 0-- status, future proof designated by two bits
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create user_has_orders table */
