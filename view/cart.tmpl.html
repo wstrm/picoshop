@@ -5,6 +5,7 @@
 	{{ with .Data.Articles }}
 	<table class="cart">
 		<tr>
+			<th>Image</th>
 			<th>Article</th>
 			<th>Price</th>
 			<th>Operation</th>
@@ -12,6 +13,7 @@
 
 		{{range $element, $pos := . }}
 		<tr>
+			<td><img class="article" src="/static/image/{{ $element.ImageName }}" alt="{{ $element.Name }} image"></img></td>
 			<td>{{ $element.Name }}</td>
 			<td>{{ $element.Price }}</td>
 			<td>

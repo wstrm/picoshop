@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -61,4 +62,50 @@ func graceful(fn func() error) {
 			panic(err)
 		}
 	}()
+}
+
+func updateUser(user User) error {
+	_, err := database.Exec(`
+		UPDATE .user SET Name, Email, PhoneNumber
+		(?, ?, ?)`, &user.Name, &user.Email, &user.PhoneNumber)
+	return err
+}
+
+func addComment(comment Comment) error {
+	_, err := database.Exec(`
+		INSERT INTO comments
+		(?, ?)`, &comment.Text, &comment.User)
+	return err
+}
+
+func SetOrderStatus(id int64, status int) error {
+	_, err := database.Exec(`
+		UPDATE .order SET status = ? WHERE id=?
+		`, &status, &id)
+	return err
+}
+
+func GetCommentsByArticleId(id int64) (comments []Comment, err error) {
+	rows, err := database.Query(`
+		SELECT text FROM comments WHERE comments.article = (?)`, &id)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		comment := Comment{}
+
+		err = rows.Scan(
+			&comment.Text)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		comments = append(comments, comment)
+	}
+
+	err = rows.Err()
+	return
 }

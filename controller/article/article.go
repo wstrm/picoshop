@@ -14,8 +14,9 @@ type articleHandler struct {
 }
 
 type articleData struct {
-	Error   string
-	Article model.Article
+	Error    string
+	Article  model.Article
+	Comments []model.Comment
 }
 
 func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -37,8 +38,9 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		view.Render(request.Context(), writer, "article", view.Page{
 			Title: "Article - Picoshop",
 			Data: articleData{
-				Error:   "",
-				Article: article,
+				Error:    "",
+				Article:  article,
+				Comments: comments,
 			},
 		})
 		return
