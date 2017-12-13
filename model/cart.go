@@ -25,20 +25,52 @@ func AddArticleToCart(customerId int64, articleId int64) error {
 	return err
 }
 
-func DelArticleFromCart(customerId int64, articleId int64) error {
-	_, err := database.Exec(`
-		START TRANSACTION;
+func DeleteArticleFromCart(customerId int64, articleId int64) (err error) {
+	tx, err := database.Begin()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
 
+	update, err := tx.Prepare(`
 		UPDATE cart
-		SET quantity = quantity - 1
-		WHERE customer = ? AND article = ?;
+		SET quantity = (quantity - 1)
+		WHERE (customer = ?) AND (article = ?);
+	`)
+	if err != nil {
+		return
+	}
 
+	delete, err := tx.Prepare(`
 		DELETE FROM cart
-		WHERE customer = ? AND article = ? AND quantity < 1
+		WHERE (customer = ?) AND (article = ?) AND (quantity < 1)
 		LIMIT 1;
+	`)
+	if err != nil {
+		return
+	}
 
-		COMMIT;
-	`, &customerId, &articleId, &customerId, &articleId)
+	if _, err = update.Exec(&customerId, &articleId); err != nil {
+		return
+	}
+	if _, err = delete.Exec(&customerId, &articleId); err != nil {
+		return
+	}
+
+	return
+}
+
+func DeleteCart(customerId int64) error {
+	_, err := database.Exec(`
+		DELETE FROM cart
+		WHERE customer = ?
+	`, &customerId)
 
 	return err
 }

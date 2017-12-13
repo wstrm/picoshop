@@ -18,8 +18,9 @@
 			<td>{{ .Price }}</td>
 			<td>{{ $i.Quantity }}</td>
 			<td>
-				<form action="/cart?{{ .Id }}" method="DELETE">
+				<form action="/cart" method="DELETE">
 					<input type="hidden" name="_method" value="DELETE">
+					<input type="hidden" name="article" value="{{ .Id }}">
 					<button type="submit">Remove</button>
 				</form>
 			</td>

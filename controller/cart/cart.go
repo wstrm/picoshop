@@ -51,6 +51,31 @@ func getCustomerFromCtx(ctx context.Context) (customer model.Customer, err error
 	return
 }
 
+func parseArticleId(article string) (id int64, err error) {
+	if err = helper.IsFilled(article); err != nil {
+		return
+	}
+
+	id, err = strconv.ParseInt(article, 10, 64)
+	return
+}
+
+func renderCart(writer http.ResponseWriter, request *http.Request, customerId int64) {
+	cart, err := model.GetCart(customerId)
+	if err != nil {
+		log.Println(err)
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	view.Render(request.Context(), writer, "cart", view.Page{
+		Title: "Picoshop",
+		Data: cartData{
+			Cart: cart,
+		},
+	})
+}
+
 func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	customer, err := getCustomerFromCtx(request.Context())
 	if err != nil {
@@ -70,57 +95,56 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 
 	switch method {
 	case http.MethodGet: // View cart
-		view.Render(request.Context(), writer, "cart", view.Page{
-			Title: "Picoshop",
-			Data:  cartData{},
-		})
+		renderCart(writer, request, customer.Id)
 
 	case http.MethodPut: // Add article to cart
-		id := request.FormValue("article")
-		if err := helper.IsFilled(id); err != nil {
-			log.Println(err)
-			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-
-		id64, err := strconv.ParseInt(id, 10, 64)
-		if err != nil {
-			log.Println(err)
-			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
-		}
-
-		err = model.AddArticleToCart(customer.Id, id64)
+		articleId, err := parseArticleId(request.FormValue("article"))
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		cart, err := model.GetCart(customer.Id)
+		err = model.AddArticleToCart(customer.Id, articleId)
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		view.Render(request.Context(), writer, "cart", view.Page{
-			Title: "Picoshop",
-			Data: cartData{
-				Cart: cart,
-			},
-		})
+		renderCart(writer, request, customer.Id)
 
 	case http.MethodPost: // Order cart
 		http.Error(writer, "", http.StatusNotImplemented)
 
 	case http.MethodDelete:
 		article := request.FormValue("article")
-		if article != "" {
-			// Delete specific item
+
+		if article != "" { // Delete specific item
+			articleId, err := parseArticleId(article)
+			if err != nil {
+				log.Println(err)
+				http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+
+			err = model.DeleteArticleFromCart(customer.Id, articleId)
+			if err != nil {
+				log.Println(err)
+				http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+
 		} else {
-			// Delete whole cart
+			err := model.DeleteCart(customer.Id)
+			if err != nil {
+				log.Println(err)
+				http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
 		}
+
+		renderCart(writer, request, customer.Id)
 
 	default:
 		http.Error(writer, "", http.StatusMethodNotAllowed)
