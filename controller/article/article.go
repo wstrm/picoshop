@@ -48,7 +48,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			if text != "" {
 				err := model.AddComment(id64, model.Comment{
 					Text:     text,
-					Customer: customer.Id,
+					Customer: customer,
 				})
 				if err != nil {
 					log.Println(err)

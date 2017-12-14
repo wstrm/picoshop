@@ -12,7 +12,7 @@
   <h2>Product highlights</h2>
   <p>Maybe you are interested in...</p>
   {{ range . }}
-  <a href="/article?id={{ .Id }}">
+  <a class="article" href="/article?id={{ .Id }}">
 	  <h3>{{ .Name }}</h3>
 	  <img class="article" src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
 	  <p><em>Only {{ .Price }}!</em></p>

@@ -301,6 +301,20 @@ div.main {
 table.warehouse td {
 	text-align: left;
 }
- img.article {
-	 width: 50%;
- }
+
+/* article */
+img.article {
+	width: 50%;
+}
+
+a.article, a.article:hover, a.article:visited, a.ariticle:active {
+	font-style: inherit;
+	color: inherit;
+	background-color: transparent;
+	font-size: inherit;
+	text-decoration: none;
+	font-variant: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	font-family: inherit;
+}

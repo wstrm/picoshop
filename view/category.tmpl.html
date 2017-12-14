@@ -8,9 +8,9 @@
 	{{ end }}
 	{{ with .Data.Articles }}
 	{{ range . }}
-	<a href="/article?id={{ .Id }}">
+	<a class="article" href="/article?id={{ .Id }}">
 		<h2>{{ .Name }}</h2>
-		<img src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
+		<img class="article" src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
 		<p>{{ .Description }}</p>
 		<h3>Price: {{ .Price }}</h3>
 	</a>

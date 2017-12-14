@@ -6,31 +6,37 @@
 	<img class="article" src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
 	<p>{{ .Description }}</p>
 	<h3>Price: {{ .Price }}</h3>
-	<h3>Comments</h3>
-	<table>
-	{{ range $element := $.Data.Comments }}
-		<tr>
-			<td>{{ $element.Customer }}</td>
-			<td>{{ $element.Text}}</td>
-		</tr>
-	{{ end }}
-	</table>
 	{{ if (context "Customer") }}
 	<form action="/cart?article={{ .Id }}" method="PUT">
 		<input type="hidden" name="_method" value="PUT">
 		<input type="hidden" name="article" value="{{ .Id }}">
 		<button type="submit">Add to cart</button>
 	</form>
+	{{ end }}
 
-	<h2>Comment</h2>
+	<h2>Comments</h2>
+	{{ with $.Data.Comments }}
+	<table>
+		{{ range $comment := . }}
+		<tr>
+			<td>{{ .Customer.Name }}:</td>
+			<td>{{ .Text}}</td>
+		</tr>
+		{{ end }}
+	</table>
+	{{ else }}
+	<p>No one has commented on this product yet.</p>
+	{{ end }}
+	{{ if (context "Customer") }}
 	<form action="/article?id={{ .Id }}" method="POST">
-            <input type="text" id="comment" name="text">
-            <button type="submit">Submit</button>
-        </form>
+		<label for="comment">Post a comment:</label>
+		<input type="text" id="comment" name="text">
+		<button type="submit">Sent</button>
+	</form>
 	{{ else }}
 	<p><em>Please login to purchase or comment on this product.</em></p>
 	{{ end }}
 	{{ end }}
-    </table>
+	</table>
 </div>
 {{ template "footer" }}
