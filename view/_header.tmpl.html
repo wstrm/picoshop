@@ -25,14 +25,14 @@
 
 			{{ with (or (or $customer $admin) $warehouse) }}
 			<li class="right hover"><a href="/logout">Logout</a></li>
-			<li class="right"><a href="/user">Welcome {{ .Name }}!</a></li>
+			{{ if $customer }}
+			<li class="right hover"><a href="/order">Orders</a></li>
+			<li class="right hover"><a href="/cart">Cart</a></li>
+			{{ end }}
+			<li class="right hover"><a href="/user">Welcome {{ .Name }}!</a></li>
 			{{ else }}
 			<li class="right hover"><a href="/login">Login</a></li>
 			<li class="right hover"><a href="/register">Register</a></li>
-			{{ end }}
-
-			{{ if $customer }}
-			<li class="right hover"><a href="/cart">Cart</a></li>
 			{{ end }}
 
 			<li class="right">

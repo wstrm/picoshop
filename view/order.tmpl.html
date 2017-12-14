@@ -1,0 +1,59 @@
+{{ template "header" . }}
+
+<div class = "midbox">
+	<h1>Current orders</h1>
+
+	{{ range $order := .Data.Orders }}
+	<div class="order">
+		{{ with $order }}
+		<h2>Order #{{ .Id }}</h2>
+		<table>
+			<tr>
+				<th>Status:</th>
+				<td>{{ .Status }}</td>
+			</tr>
+			{{ with .Address }}
+			<tr>
+				<th>Street:</th>
+				<td>{{ .Street }}</td>
+			</tr>
+			<tr>
+				<th>C/O:</th>
+				<td>{{ .CareOf }}</td>
+			</tr>
+			<tr>
+				<th>Zip code:</th>
+				<td>{{ .ZipCode }}</td>
+			</tr>
+			<tr>
+				<th>Country:</th>
+				<td>{{ .Country }}</td>
+			</tr>
+			{{ end }}
+		</table>
+
+		<h3>Articles</h3>
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Quantity</th>
+			</tr>
+			{{ range $item := .Items }}
+			<tr>
+				{{ with $item.Article }}
+				<td>{{ .Id }}</td>
+				<td>{{ .Name }}</td>
+				{{ end }}
+				{{ with $item.Quantity }}
+				<td>{{ . }}</td>
+				{{ end }}
+			</tr>
+			{{ end }}
+		</table>
+		{{ end }}
+	</div>
+	{{ end }}
+</div>
+
+{{ template "footer" }}

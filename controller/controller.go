@@ -10,6 +10,7 @@ import (
 	"github.com/willeponken/picoshop/controller/home"
 	"github.com/willeponken/picoshop/controller/login"
 	"github.com/willeponken/picoshop/controller/logout"
+	"github.com/willeponken/picoshop/controller/order"
 	"github.com/willeponken/picoshop/controller/register"
 	"github.com/willeponken/picoshop/controller/search"
 	"github.com/willeponken/picoshop/controller/static"
@@ -56,6 +57,18 @@ func getUserPolicy() auth.Policy {
 	return policy
 }
 
+func getCustomerPolicy() auth.Policy {
+	policy := auth.NewPolicy()
+
+	policy.SetProtected(true)
+
+	policy.SetUser(model.Admin{}, false)
+	policy.SetUser(model.Warehouse{}, false)
+	policy.SetUser(model.Customer{}, true)
+
+	return policy
+}
+
 func getOpenPolicy() auth.Policy {
 	policy := auth.NewPolicy()
 
@@ -74,6 +87,7 @@ func New() *http.ServeMux {
 	openPolicy := getOpenPolicy()         // *
 	adminPolicy := getAdminPolicy()       // A
 	userPolicy := getUserPolicy()         // A, W, C
+	customerPolicy := getCustomerPolicy() // C
 
 	mux.Handle("/", c.Middleware(a.Middleware(
 		home.NewHandler(), openPolicy)))
@@ -90,11 +104,14 @@ func New() *http.ServeMux {
 	mux.Handle("/user", c.Middleware(a.Middleware(
 		user.NewHandler(a), userPolicy)))
 
+	mux.Handle("/order", c.Middleware(a.Middleware(
+		order.NewHandler(), customerPolicy)))
+
 	mux.Handle("/article", c.Middleware(a.Middleware(
 		article.NewHandler(), openPolicy)))
 
 	mux.Handle("/cart", c.Middleware(a.Middleware(
-		cart.NewHandler(), userPolicy)))
+		cart.NewHandler(), customerPolicy)))
 
 	mux.Handle("/admin/", c.Middleware(a.Middleware(
 		http.StripPrefix("/admin",
