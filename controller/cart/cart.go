@@ -101,7 +101,7 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		articleId, err := parseArticleId(request.FormValue("article"))
 		if err != nil {
 			log.Println(err)
-			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			http.Error(writer, "Invalid article ID", http.StatusBadRequest)
 			return
 		}
 
@@ -125,7 +125,7 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		err := helper.IsFilled(address.Street, address.CareOf, address.ZipCode, address.Country)
 		if err != nil {
 			log.Println(err)
-			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			http.Error(writer, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -135,7 +135,7 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 			return
 		}
 
-		http.Redirect(writer, request, "/", http.StatusSeeOther)
+		http.Redirect(writer, request, "/order", http.StatusSeeOther)
 
 	case http.MethodDelete:
 		article := request.FormValue("article")
@@ -144,7 +144,7 @@ func (c *cartHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 			articleId, err := parseArticleId(article)
 			if err != nil {
 				log.Println(err)
-				http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				http.Error(writer, "Invalid article ID", http.StatusBadRequest)
 				return
 			}
 

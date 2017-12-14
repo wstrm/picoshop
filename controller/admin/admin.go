@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/willeponken/picoshop/controller/helper"
 	"github.com/willeponken/picoshop/model"
@@ -171,6 +172,8 @@ func newRegisterHandler() *registerHandler {
 }
 
 func NewMux() *http.ServeMux {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	mux := http.NewServeMux()
 
 	mux.Handle("/", newRootHandler())

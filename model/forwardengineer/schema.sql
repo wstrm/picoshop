@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS address (
 	id INT AUTO_INCREMENT,
 	street VARCHAR(255) NOT NULL,
 	care_of VARCHAR(255) NULL,
-	zip_code INT(11) NOT NULL,
+	zip_code VARCHAR(255) NOT NULL,
 	country VARCHAR(255) NOT NULL);
 
 /* Create user_has_addresses table */

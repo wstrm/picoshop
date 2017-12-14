@@ -1,22 +1,29 @@
 {{ template "header" . }}
 
 <div class = "midbox">
-    <table class="search">
-        <tr>
-            <th>Image</th>
-            <th>Article</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-	{{range $element := .Data.Articles}}
-        <tr>
-            <td><img class="article" src="/static/image/{{ $element.ImageName }}" alt="{{ $element.Name }} image"></img></td>
-            <td>{{ $element.Name }}</td>
-            <td>{{ $element.Price }}</td>
-            <td></td>
-        </tr>
+	<h1>Search result for: {{ .Data.Query }}</h1>
+	{{ if .Data.Articles }}
+	<table class="search">
+		<tr>
+			<th>Image</th>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Price</th>
+		</tr>
+		{{range $article := .Data.Articles}}
+		<a class="article" href="/article?id={{ $article.Id }}">
+			<tr>
+				<td><img class="article" src="/static/image/{{ $article.ImageName }}" alt="{{ $article.Name }} image"></img></td>
+				<td>{{ $article.Name }}</td>
+				<td>{{ $article.Description }}</td>
+				<td>{{ $article.Price }}</td>
+			</tr>
+		</a>
+		{{ end }}
+	</table>
+	{{ else }}
+	<h2>Sorry, the search returned no results... :(</h2>
 	{{ end }}
-    </table>
 </div>
 
 {{ template "footer" }}

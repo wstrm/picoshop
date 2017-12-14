@@ -1,4 +1,4 @@
-// This file is generated automatically by inlinesql at 2017-12-13 18:45:51.956944693 +0100 CET m=+0.000940139.
+// This file is generated automatically by inlinesql at 2017-12-14 11:18:01.959937124 +0100 CET m=+0.001197386.
 package forwardengineer
 
 func GetQueries() []string {
@@ -6,7 +6,7 @@ func GetQueries() []string {
 		"SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0",
 		"SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0",
 		"SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES'",
-		"CREATE TABLE IF NOT EXISTS address ( PRIMARY KEY (id), id INT AUTO_INCREMENT, street VARCHAR(255) NOT NULL, care_of VARCHAR(255) NULL, zip_code INT(11) NOT NULL, country VARCHAR(255) NOT NULL)",
+		"CREATE TABLE IF NOT EXISTS address ( PRIMARY KEY (id), id INT AUTO_INCREMENT, street VARCHAR(255) NOT NULL, care_of VARCHAR(255) NULL, zip_code VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS user_has_addresses ( PRIMARY KEY (`user`, address), `user` INT NOT NULL, address INT NOT NULL)",
 		"CREATE TABLE IF NOT EXISTS `user` ( PRIMARY KEY (id),  UNIQUE INDEX uc_email (email ASC), id INT AUTO_INCREMENT, email VARCHAR(255) NOT NULL, hash BINARY(60) NOT NULL, name VARCHAR(255) NOT NULL, phone_number VARCHAR(50), create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE IF NOT EXISTS `comment` ( PRIMARY KEY (id), FOREIGN KEY (customer)  REFERENCES customer(id), FOREIGN KEY (article)  REFERENCES article(id), id INT AUTO_INCREMENT, article INT NOT NULL, rating DECIMAL(10, 0),  text VARCHAR(255) NOT NULL, create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, customer INT NOT NULL)",

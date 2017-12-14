@@ -15,6 +15,7 @@ type searchHandler struct {
 
 type searchData struct {
 	Error    string
+	Query    string
 	Articles []model.Article
 }
 
@@ -46,6 +47,7 @@ func (a *searchHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	}
 
 	renderSearch(ctx, writer, http.StatusOK, searchData{
+		Query:    query,
 		Articles: articles,
 	})
 	return
