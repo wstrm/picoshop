@@ -1,67 +1,120 @@
 package user
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/willeponken/picoshop/controller/helper"
+	"github.com/willeponken/picoshop/middleware/auth"
 	"github.com/willeponken/picoshop/model"
 	"github.com/willeponken/picoshop/view"
 )
 
 type userHandler struct {
 	http.Handler
+	auth *auth.Manager
 }
 
 type userData struct {
 	User model.User
 }
 
-func (u *userHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	admin := ctx.Value("Admin")
-	warehouse := ctx.Value("Warehouse")
-	customer := ctx.Value("Customer")
+func renderUser(ctx context.Context, writer http.ResponseWriter, code int, data interface{}) {
+	writer.WriteHeader(code)
 
-	var user model.User
-	if admin != "" {
-		a, ok := admin.(model.Admin)
-		user = a.User
-		if !ok {
-			http.Error(writer, "I fucked up", http.StatusInternalServerError)
-			return
+	if data == nil {
+		data = userData{}
+	}
+
+	page := view.Page{
+		Title: "User - Picoshop",
+		Data:  data,
+	}
+
+	view.Render(ctx, writer, "user", page)
+}
+
+func (u *userHandler) getUser(request *http.Request) (user model.User, err error) {
+	authUser, err := u.auth.GetUser(request)
+	if err != nil {
+		return
+	}
+
+	var ok bool
+	switch authUser.(type) {
+	case model.Admin:
+		var a model.Admin
+		a, ok = authUser.(model.Admin)
+		if ok {
+			user = a.User
 		}
-	} else if warehouse != "" {
-		w, ok := warehouse.(model.Warehouse)
-		user = w.User
-		if !ok {
-			http.Error(writer, "I fucked up", http.StatusInternalServerError)
-			return
+	case model.Warehouse:
+		var w model.Warehouse
+		w, ok = authUser.(model.Warehouse)
+		if ok {
+			user = w.User
 		}
-	} else if customer != "" {
-		c, ok := customer.(model.Customer)
-		user = c.User
-		if !ok {
-			http.Error(writer, "I fucked up", http.StatusInternalServerError)
-			return
+	case model.Customer:
+		var c model.Customer
+		c, ok = authUser.(model.Customer)
+		if ok {
+			user = c.User
 		}
+	default:
+		err = fmt.Errorf("unsupported user type: %T", authUser)
+		return
+	}
+
+	if !ok {
+		err = fmt.Errorf("cannot type assert %v to model.User", authUser)
+	}
+
+	return
+}
+
+func (u *userHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	user, err := u.getUser(request)
+	if err != nil {
+		log.Println(err)
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	switch request.Method {
 	case http.MethodGet:
-		view.Render(request.Context(), writer, "user", view.Page{
-			Title: "Picoshop",
-			Data: userData{
-				User: user,
-			},
-		})
+		renderUser(request.Context(), writer, http.StatusOK, userData{user})
+		return
 
 	case http.MethodPost:
-		http.Error(writer, "", http.StatusNotImplemented)
+		name := request.FormValue("name")
+		phone := request.FormValue("phone")
+		if err := helper.IsFilled(name, phone); err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+
+		user.Name = name
+		user.PhoneNumber = phone
+
+		if err := model.UpdateUser(user); err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		u.auth.Logout(writer, request)
+		http.Redirect(writer, request, "/", http.StatusSeeOther)
 
 	default:
-		http.Error(writer, "", http.StatusMethodNotAllowed)
+		http.Error(writer, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
 }
 
-func NewHandler() *userHandler {
-	return &userHandler{}
+func NewHandler(auth *auth.Manager) *userHandler {
+	return &userHandler{
+		auth: auth,
+	}
 }

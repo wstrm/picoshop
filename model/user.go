@@ -265,7 +265,9 @@ func PutCustomer(customer Customer) (Customer, error) {
 
 func UpdateUser(user User) error {
 	_, err := database.Exec(`
-		UPDATE .user SET Name, Email, PhoneNumber
-		(?, ?, ?)`, &user.Name, &user.Email, &user.PhoneNumber)
+		UPDATE .user
+		SET name=?, phone_number=?
+		WHERE email=?
+	`, &user.Name, &user.PhoneNumber, &user.Email)
 	return err
 }

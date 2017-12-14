@@ -110,12 +110,14 @@ func GetAllOrders() (orders []Order, err error) {
 
 		err = articleRows.Err()
 		articleRows.Close()
-		articlesStmt.Close()
 
 		if err != nil {
+			articlesStmt.Close()
 			return nil, err
 		}
 	}
+
+	articlesStmt.Close()
 
 	return
 }

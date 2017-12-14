@@ -71,7 +71,7 @@ func NewManager(cookieName string, userInterfaces ...User) *Manager {
 	}
 }
 
-func (manager *Manager) getUser(request *http.Request) (user User, err error) {
+func (manager *Manager) GetUser(request *http.Request) (user User, err error) {
 	s, err := session.Get(request, manager.cookieName)
 	if err != nil {
 		return
@@ -93,7 +93,7 @@ func (manager *Manager) getUser(request *http.Request) (user User, err error) {
 
 func (manager *Manager) Middleware(next http.Handler, policy Policy) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		user, err := manager.getUser(request)
+		user, err := manager.GetUser(request)
 
 		// no user found
 		if err != nil || !user.IsValid() {

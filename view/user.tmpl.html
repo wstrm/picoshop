@@ -1,17 +1,42 @@
 {{ template "header" . }}
 
-<h1>Picoshop</h1>
-<p>Welcome to your profile!</p>
-        <div class="midbox">
-            <table>
-                <form action="/user" method="post">
-                    <input type="Name" id="Name" name="Name" value="{{ .Data.User.Name }}">
-                    <input type="E-mail" id="E-mail" name="E-mail" value="{{ .Data.User.Email }}">
-                    <input type="Phone number" id="Phone number" name="Phone number" value="{{ .Data.User.PhoneNumber }}" >
-                    <button type="submit">UPDATE</button>
-                </form>
-                <input type="Created" id="Created" name="Created" value="{{ .Data.User.CreateTime }}">
-            </table>
-        </div>
+<h1>Welcome to your profile!</h1>
+<div class="midbox">
+	{{ with .Data.User }}
+	<form action="/user" method="post">
+		<div>
+			<label for="name">Name:</label>
+			<input type="text" id="name" name="name" value="{{ .Name }}">
+		</div>
+		{{/*
+		<div>
+			<label for="email">E-mail:</label>
+			<input type="email" id="email" name="email" value="{{ .Email }}">
+		</div>
+		*/}}
+		<div>
+			<p>E-mail: {{ .Email }}</p>
+		</div>
+		<div>
+			<label for="phone">Phone number:</label>
+			<input type="tel" id="phone" name="phone" value="{{ .PhoneNumber }}">
+		</div>
+		{{/*
+		<div>
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" value="{{ .Password }}">
+		</div>
+		<div>
+			<label for="password-retype">Re-type password:</label>
+			<input type="password" id="password-retype" name="password-retype" value="{{ .PasswordRetype }}">
+		</div>
+		*/}}
+		<div>
+			<button type="submit">Update</button>
+		</div>
+	</form>
+	Member since: {{ .CreateTime }}
+	{{ end }}
+</div>
 
 {{ template "footer" }}

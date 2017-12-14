@@ -88,7 +88,7 @@ func New() *http.ServeMux {
 		register.NewHandler(a), openPolicy)))
 
 	mux.Handle("/user", c.Middleware(a.Middleware(
-		user.NewHandler(), userPolicy)))
+		user.NewHandler(a), userPolicy)))
 
 	mux.Handle("/article", c.Middleware(a.Middleware(
 		article.NewHandler(), openPolicy)))
