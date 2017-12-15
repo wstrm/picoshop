@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `comment` (
 
 	id INT AUTO_INCREMENT,
 	article INT NOT NULL,
-	rating DECIMAL(10, 0), -- rating between 0-10 stars
 	text VARCHAR(255) NOT NULL,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
@@ -64,6 +63,31 @@ CREATE TABLE IF NOT EXISTS article (
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
 	subcategory VARCHAR(255) NOT NULL);
+	rating INT, -- rating up or down
+
+
+/* Create article ratings table */
+CREATE TABLE IF NOT EXISTS ratings (
+  PRIMARY KEY (id),
+
+  id INT AUTO_INCREMENT,
+  nr_up INT,
+  nt_down INT,
+  average DECIMAL(100, 0),
+)
+
+/* Create customer has rated type table */
+CREATE TABLE IF NOT EXISTS customer_has_rated (
+  PRIMARY KEY (customer, article, rated),
+  FOREIGN KEY (customer)
+    REFERENCES customer(id),
+  FOREIGN KEY (article)
+    REFERENCES article(id),
+
+  customer INT NOT NULL,
+  article INT NOT NULL,
+  rated INT NOT NULL,
+)
 
 /* Create subcategory table */
 CREATE TABLE IF NOT EXISTS subcategory (
@@ -73,6 +97,7 @@ CREATE TABLE IF NOT EXISTS subcategory (
 
 	name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL);
+
 
 /* Create subcategory_has_articles table */
 CREATE TABLE IF NOT EXISTS subcategory_has_articles (

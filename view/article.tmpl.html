@@ -10,6 +10,7 @@
 	<form action="/cart?article={{ .Id }}" method="PUT">
 		<input type="hidden" name="_method" value="PUT">
 		<input type="hidden" name="article" value="{{ .Id }}">
+		<input type="hidden" name="rating" value="{{ .Average }}">
 		<button type="submit">Add to cart</button>
 	</form>
 	{{ end }}
@@ -29,12 +30,14 @@
 	{{ end }}
 	{{ if (context "Customer") }}
 	<form action="/article?id={{ .Id }}" method="POST">
+		<button type="submit">UP VOTE</button>
+		<button type="submit">DOWN VOTE</button>
 		<label for="comment">Post a comment:</label>
 		<input type="text" id="comment" name="text">
 		<button type="submit">Send</button>
 	</form>
 	{{ else }}
-	<p><em>Please login to purchase or comment on this product.</em></p>
+	<p><em>Please login to purchase, comment or rate this product.</em></p>
 	{{ end }}
 	{{ end }}
 	</table>
