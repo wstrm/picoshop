@@ -29,9 +29,13 @@
 	<p>No one has commented on this product yet.</p>
 	{{ end }}
 	{{ if (context "Customer") }}
+
+
+	<form action="article"
+        <button type="submit">UP VOTE</button>
+        <button type="submit">DOWN VOTE</button>
+
 	<form action="/article?id={{ .Id }}" method="POST">
-		<button type="submit">UP VOTE</button>
-		<button type="submit">DOWN VOTE</button>
 		<label for="comment">Post a comment:</label>
 		<input type="text" id="comment" name="text">
 		<button type="submit">Send</button>

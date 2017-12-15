@@ -62,32 +62,34 @@ CREATE TABLE IF NOT EXISTS article (
 	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
-	subcategory VARCHAR(255) NOT NULL);
-	rating INT, -- rating up or down
+	subcategory VARCHAR(255) NOT NULL,
+	rating INT -- rating up or down
+	);
 
 
 /* Create article ratings table */
-CREATE TABLE IF NOT EXISTS ratings (
+CREATE TABLE IF NOT EXISTS rating (
   PRIMARY KEY (id),
 
   id INT AUTO_INCREMENT,
   nr_up INT,
-  nt_down INT,
-  average DECIMAL(100, 0),
-)
+  nr_down INT,
+  average DECIMAL(100, 0)
+);
 
 /* Create customer has rated type table */
 CREATE TABLE IF NOT EXISTS customer_has_rated (
-  PRIMARY KEY (customer, article, rated),
+  PRIMARY KEY (id),
   FOREIGN KEY (customer)
     REFERENCES customer(id),
   FOREIGN KEY (article)
     REFERENCES article(id),
 
+  id INT AUTO_INCREMENT,
   customer INT NOT NULL,
   article INT NOT NULL,
-  rated INT NOT NULL,
-)
+  rated INT NOT NULL
+);
 
 /* Create subcategory table */
 CREATE TABLE IF NOT EXISTS subcategory (
