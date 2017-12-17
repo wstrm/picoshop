@@ -63,21 +63,19 @@ CREATE TABLE IF NOT EXISTS article (
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
 	subcategory VARCHAR(255) NOT NULL,
-	rating INT -- rating up or down
-	);
+	rating INT); -- rating up or down
 
 
-/* Create article ratings table */
-CREATE TABLE IF NOT EXISTS rating (
+/* Create article_rating table */
+CREATE TABLE IF NOT EXISTS article_rating (
   PRIMARY KEY (id),
 
   id INT AUTO_INCREMENT,
   nr_up INT,
   nr_down INT,
-  average DECIMAL(100, 0)
-);
+  average DECIMAL(100, 0));
 
-/* Create customer has rated type table */
+/* Create customer_has_rated type table */
 CREATE TABLE IF NOT EXISTS customer_has_rated (
   PRIMARY KEY (id),
   FOREIGN KEY (customer)
@@ -88,8 +86,7 @@ CREATE TABLE IF NOT EXISTS customer_has_rated (
   id INT AUTO_INCREMENT,
   customer INT NOT NULL,
   article INT NOT NULL,
-  rated INT NOT NULL
-);
+  rated INT NOT NULL);
 
 /* Create subcategory table */
 CREATE TABLE IF NOT EXISTS subcategory (
