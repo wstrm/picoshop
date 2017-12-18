@@ -1,4 +1,4 @@
-// This file is generated automatically by inlinesql at 2017-12-18 13:09:24.57155253 +0100 CET m=+0.001243883.
+// This file is generated automatically by inlinesql at 2017-12-18 19:39:25.384387807 +0100 CET m=+0.001328418.
 package forwardengineer
 
 func GetQueries() []string {

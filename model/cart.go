@@ -1,6 +1,9 @@
 package model
 
-import "log"
+import (
+	"database/sql"
+	"log"
+)
 
 type CartItem struct {
 	Quantity int
@@ -82,6 +85,31 @@ func newCartItem(quantity int, article Article) CartItem {
 	}
 }
 
+func scanCart(rows *sql.Rows) (cart Cart, err error) {
+	var quantity int
+	var article Article
+	var categoryName, subcategoryName string
+
+	for rows.Next() {
+		err = rows.Scan(
+			&article.Id, &article.Name, &article.Description,
+			&article.Price, &article.ImageName, &categoryName, &subcategoryName,
+			&quantity)
+
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		article.Category = NewCategory(categoryName)
+		article.Subcategory = NewSubcategory(subcategoryName)
+
+		cart.Items = append(cart.Items, newCartItem(quantity, article))
+	}
+
+	err = rows.Err()
+	return
+}
+
 func GetCart(customerId int64) (cart Cart, err error) {
 	rows, err := database.Query(`
 		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, c.quantity
@@ -98,23 +126,8 @@ func GetCart(customerId int64) (cart Cart, err error) {
 
 	defer rows.Close()
 
-	var quantity int
-	var article Article
+	cart, err = scanCart(rows)
 
-	for rows.Next() {
-		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description,
-			&article.Price, &article.ImageName, &article.Category, &article.Subcategory,
-			&quantity)
-
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		cart.Items = append(cart.Items, newCartItem(quantity, article))
-	}
-
-	err = rows.Err()
 	return
 }
 
@@ -131,6 +144,7 @@ func OrderCart(customerId int64, address Address) (err error) {
 		err = tx.Commit()
 	}()
 
+	// Create a new address
 	addressResult, err := tx.Exec(`
 		INSERT INTO address
 		(street, care_of, zip_code, country, customer)
@@ -146,6 +160,7 @@ func OrderCart(customerId int64, address Address) (err error) {
 		return
 	}
 
+	// Create new order for customer with address
 	orderResult, err := tx.Exec(`
 		INSERT INTO .order
 		(customer, address)
@@ -161,19 +176,33 @@ func OrderCart(customerId int64, address Address) (err error) {
 		return
 	}
 
+	// Insert all articles in cart to order_has_articles
 	_, err = tx.Exec(`
-		INSERT INTO order_has_articles o
-		(o.order, o.article, o.quantity, o.price)
+		INSERT INTO order_has_articles
+		(order_has_articles.order, article, quantity, price)
 		SELECT ?, c.article, c.quantity, a.price
 		FROM cart c
 		INNER JOIN article a
 		ON c.article = a.id
 		WHERE c.customer = ?
+		AND a.in_stock > 0
 	`, &orderId, &customerId)
 	if err != nil {
 		return
 	}
 
+	// Decrement in stock for each article in order
+	_, err = tx.Exec(`
+		UPDATE article a
+		LEFT JOIN order_has_articles o
+		ON a.id = o.article AND o.order = ?
+		SET a.in_stock = a.in_stock - o.quantity
+	`, &orderId)
+	if err != nil {
+		return
+	}
+
+	// Delete cart (so user can start all over again)
 	_, err = tx.Exec(`
 		DELETE FROM cart
 		WHERE customer = ?

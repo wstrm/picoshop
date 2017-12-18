@@ -97,13 +97,17 @@ func GetAllOrders() (orders []Order, err error) {
 
 		var quantity int
 		var article Article
+		var categoryName, subcategoryName string
 		for articleRows.Next() {
 			err = articleRows.Scan(
 				&article.Id, &article.Name, &article.Description, &article.Price,
-				&article.ImageName, &article.Category, &article.Subcategory, &quantity)
+				&article.ImageName, &categoryName, &subcategoryName, &quantity)
 			if err != nil {
 				log.Panicln(err)
 			}
+
+			article.Category = NewCategory(categoryName)
+			article.Subcategory = NewSubcategory(subcategoryName)
 
 			orders[i].Items = append(orders[i].Items, newOrderItem(quantity, article))
 		}
