@@ -5,8 +5,12 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 /* Create address table */
 CREATE TABLE IF NOT EXISTS address (
 	PRIMARY KEY (id),
+	FOREIGN KEY (customer)
+		REFERENCES customer(id)
+		ON DELETE CASCADE,
 
 	id INT AUTO_INCREMENT,
+	customer INT NOT NULL,
 	street VARCHAR(255) NOT NULL,
 	care_of VARCHAR(255) NULL,
 	zip_code VARCHAR(255) NOT NULL,
@@ -22,7 +26,6 @@ CREATE TABLE IF NOT EXISTS user_has_addresses (
 /* Create user table */
 CREATE TABLE IF NOT EXISTS `user` (
 	PRIMARY KEY (id),
-	/* TODO(willeponken): Add delete trigger for addresses */
 
 	UNIQUE INDEX uc_email (email ASC),
 
@@ -39,14 +42,14 @@ CREATE TABLE IF NOT EXISTS `comment` (
 	FOREIGN KEY (customer)
 		REFERENCES customer(id),
 	FOREIGN KEY (article)
-		REFERENCES article(id),
+		REFERENCES article(id)
+		ON DELETE CASCADE,
 
 	id INT AUTO_INCREMENT,
 	article INT NOT NULL,
 	text VARCHAR(255) NOT NULL,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	customer INT NOT NULL);
-
 
 /* Create article table */
 CREATE TABLE IF NOT EXISTS article (
@@ -59,44 +62,46 @@ CREATE TABLE IF NOT EXISTS article (
 	id INT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	description VARCHAR(255) NOT NULL,
-	price DECIMAL(11, 4) NOT NULL, -- decimal with 11 bits and 4 decimals
+	price DECIMAL(11, 4) UNSIGNED NOT NULL, -- decimal with 11 bits and 4 decimals
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
 	subcategory VARCHAR(255) NOT NULL,
-	rating INT); -- rating up or down
+	in_stock INT UNSIGNED DEFAULT 0);
 
+/* Create article_has_rating table */
+CREATE TABLE IF NOT EXISTS article_has_rating (
+	PRIMARY KEY (id),
+	FOREIGN KEY (article)
+		REFERENCES article(id)
+		ON DELETE CASCADE,
 
-/* Create article_rating table */
-CREATE TABLE IF NOT EXISTS article_rating (
-  PRIMARY KEY (id),
-
-  id INT AUTO_INCREMENT,
-  nr_up INT,
-  nr_down INT,
-  average DECIMAL(100, 0));
+	id INT AUTO_INCREMENT,
+	article INT NOT NULL,
+	nr_up INT UNSIGNED DEFAULT 0,
+	nr_down INT UNSIGNED DEFAULT 0);
 
 /* Create customer_has_rated type table */
 CREATE TABLE IF NOT EXISTS customer_has_rated (
-  PRIMARY KEY (id),
-  FOREIGN KEY (customer)
-    REFERENCES customer(id),
-  FOREIGN KEY (article)
-    REFERENCES article(id),
+	PRIMARY KEY (id),
+	FOREIGN KEY (customer)
+		REFERENCES customer(id),
+	FOREIGN KEY (article)
+		REFERENCES article(id),
 
-  id INT AUTO_INCREMENT,
-  customer INT NOT NULL,
-  article INT NOT NULL,
-  rated INT NOT NULL);
+	id INT AUTO_INCREMENT,
+	customer INT NOT NULL,
+	article INT NOT NULL,
+	rated TINYINT NOT NULL); -- (0 none), (-1 down), (1 up)
 
 /* Create subcategory table */
 CREATE TABLE IF NOT EXISTS subcategory (
 	PRIMARY KEY (name),
 	FOREIGN KEY (category)
-		REFERENCES category(name),
+		REFERENCES category(name)
+		ON DELETE CASCADE,
 
 	name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL);
-
 
 /* Create subcategory_has_articles table */
 CREATE TABLE IF NOT EXISTS subcategory_has_articles (
@@ -130,7 +135,8 @@ CREATE TABLE IF NOT EXISTS order_has_articles (
 
 	`order` INT NOT NULL,
 	article INT NOT NULL,
-	quantity INT NOT NULL);
+	price DECIMAL(11, 4) UNSIGNED NOT NULL, -- decimal with 11 bits and 4 decimals
+	quantity INT UNSIGNED NOT NULL);
 
 /* Create order table */
 CREATE TABLE IF NOT EXISTS `order` (
@@ -143,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `order` (
 	id INT AUTO_INCREMENT,
 	customer INT NOT NULL,
 	address INT NOT NULL,
-	status INT NOT NULL DEFAULT 0,
+	status INT UNSIGNED NOT NULL DEFAULT 0,
 	create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 /* Create cart table */
@@ -152,7 +158,7 @@ CREATE TABLE IF NOT EXISTS cart (
 
 	customer INT NOT NULL,
 	article INT NOT NULL,
-	quantity INT NOT NULL);
+	quantity INT UNSIGNED NOT NULL);
 
 /* Create user_has_orders table */
 CREATE TABLE IF NOT EXISTS customer_has_orders (

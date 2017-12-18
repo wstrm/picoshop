@@ -133,10 +133,10 @@ func OrderCart(customerId int64, address Address) (err error) {
 
 	addressResult, err := tx.Exec(`
 		INSERT INTO address
-		(street, care_of, zip_code, country)
+		(street, care_of, zip_code, country, customer)
 		VALUES
-		(?, ?, ?, ?)
-	`, &address.Street, &address.CareOf, &address.ZipCode, &address.Country)
+		(?, ?, ?, ?, ?)
+	`, &address.Street, &address.CareOf, &address.ZipCode, &address.Country, &customerId)
 	if err != nil {
 		return
 	}
@@ -162,11 +162,13 @@ func OrderCart(customerId int64, address Address) (err error) {
 	}
 
 	_, err = tx.Exec(`
-		INSERT INTO order_has_articles
-		(order_has_articles.order, order_has_articles.article, order_has_articles.quantity)
-		SELECT ?, cart.article, cart.quantity
-		FROM cart
-		WHERE cart.customer = ?
+		INSERT INTO order_has_articles o
+		(o.order, o.article, o.quantity, o.price)
+		SELECT ?, c.article, c.quantity, a.price
+		FROM cart c
+		INNER JOIN article a
+		ON c.article = a.id
+		WHERE c.customer = ?
 	`, &orderId, &customerId)
 	if err != nil {
 		return

@@ -46,6 +46,7 @@ type articleData struct {
 	Id          int64
 	Category    string
 	Subcategory string
+	InStock     string
 }
 
 func (a *rootHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -128,21 +129,29 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		price := request.PostFormValue("price")
 		category := request.PostFormValue("category")
 		subcategory := request.PostFormValue("subcategory")
+		inStock := request.PostFormValue("in-stock")
 
-		if err := helper.IsFilled(name, description, price, category, subcategory); err != nil {
+		if err := helper.IsFilled(name, description, price, category, subcategory, inStock); err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		u, err := strconv.ParseFloat(price, 10)
+		p, err := strconv.ParseFloat(price, 10)
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		article, err := model.PutArticle(model.NewArticle(name, description, u, imageName, category, subcategory))
+		s, err := strconv.ParseUint(inStock, 10, 64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+
+		article, err := model.PutArticle(model.NewArticle(name, description, p, imageName, category, subcategory, s))
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

@@ -1,6 +1,9 @@
 package model
 
-import "log"
+import (
+	"database/sql"
+	"log"
+)
 
 type Article struct {
 	Id          int64
@@ -8,41 +11,47 @@ type Article struct {
 	Description string
 	Price       float64
 	ImageName   string
-	Category    string
-	Subcategory string
+	Category    Category
+	Subcategory Subcategory
+	InStock     uint64
 }
 
-func NewArticle(name, description string, price float64, imageName string, category string, subcategory string) Article {
+func NewArticle(name, description string, price float64, imageName string, categoryName string, subcategoryName string, inStock uint64) Article {
 	return Article{
 		Name:        name,
 		Description: description,
 		Price:       price,
 		ImageName:   imageName,
-		Category:    category,
-		Subcategory: subcategory,
+		Category:    NewCategory(categoryName),
+		Subcategory: NewSubcategory(subcategoryName),
+		InStock:     inStock,
 	}
 }
 
-func SearchForArticles(query string) (articles []Article, err error) {
-	rows, err := database.Query(`
-		SELECT id, name, description, price, image_name, category, subcategory
-		FROM article WHERE name LIKE ?`, "%"+query+"%")
-	if err != nil {
-		return
-	}
+func scanArticle(row *sql.Row) (article Article, err error) {
+	var categoryName, subcategoryName string
+	row.Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock)
 
-	defer rows.Close()
+	article.Category = NewCategory(categoryName)
+	article.Subcategory = NewSubcategory(subcategoryName)
 
+	return
+}
+
+func scanArticles(rows *sql.Rows) (articles []Article, err error) {
+	var article Article
+	var categoryName, subcategoryName string
 	for rows.Next() {
-		article := Article{}
+		article = Article{}
 
 		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description,
-			&article.Price, &article.ImageName, &article.Category, &article.Subcategory)
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock)
 		if err != nil {
 			log.Panicln(err)
 		}
 
+		article.Category = NewCategory(categoryName)
+		article.Subcategory = NewSubcategory(subcategoryName)
 		articles = append(articles, article)
 	}
 
@@ -50,15 +59,30 @@ func SearchForArticles(query string) (articles []Article, err error) {
 	return
 }
 
+func SearchForArticles(query string) (articles []Article, err error) {
+	rows, err := database.Query(`
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock
+		FROM article WHERE name LIKE ?`, "%"+query+"%")
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	articles, err = scanArticles(rows)
+
+	return
+}
+
 func PutArticle(article Article) (Article, error) {
-	ensureSubcategoryWithCategory(NewCategory(article.Category), NewSubcategory(article.Subcategory))
+	ensureSubcategoryWithCategory(article.Category, article.Subcategory)
 
 	result, err := database.Exec(`
 		INSERT INTO article
-		(name, description, price, image_name, category, subcategory)
+		(name, description, price, image_name, category, subcategory, in_stock)
 		VALUES
-		(?, ?, ?, ?, ?, ?)
-	`, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
+		(?, ?, ?, ?, ?, ?, ?)
+	`, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category.Name, &article.Subcategory.Name, &article.InStock)
 	if err != nil {
 		return Article{}, err
 	}
@@ -70,21 +94,22 @@ func PutArticle(article Article) (Article, error) {
 		(subcategory, article)
 		VALUES
 		(?, ?)
-	`, &article.Subcategory, &article.Id)
+	`, &article.Subcategory.Name, &article.Id)
 
 	return article, err
 }
 
 func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT (article.id, article.name, article.description, article.price, article.image_name)
-		FROM subcategory WHERE subcategory.id=?
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
+		FROM subcategory s
+		WHERE s.id=?
 
-		INNER JOIN articles
-		ON subcategory.articles = subcategory_has_articles.id
+		INNER JOIN subcategory_has_articles h
+		ON s.articles = h.id
 
-		INNER JOIN article
-		ON subcategory_has_articles.article = article.id
+		INNER JOIN article a
+		ON h.article = a.id
 	`, subcategory.Name)
 	if err != nil {
 		return
@@ -92,25 +117,14 @@ func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, er
 
 	defer rows.Close()
 
-	for rows.Next() {
-		article := Article{}
+	articles, err = scanArticles(rows)
 
-		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName)
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		articles = append(articles, article)
-	}
-
-	err = rows.Err()
 	return
 }
 
 func GetArticleHighlights(n uint) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT id, name, description, price, image_name, category, subcategory
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock
 		FROM article
 		WHERE rand() <= 0.3
 		LIMIT ?
@@ -121,35 +135,24 @@ func GetArticleHighlights(n uint) (articles []Article, err error) {
 
 	defer rows.Close()
 
-	for rows.Next() {
-		article := Article{}
+	articles, err = scanArticles(rows)
 
-		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		articles = append(articles, article)
-	}
-
-	err = rows.Err()
 	return
 }
 
 func GetArticleById(id int64) (article Article, err error) {
-	err = database.QueryRow(`
-		SELECT id, name, description, price, image_name, category, subcategory
+	article, err = scanArticle(database.QueryRow(`
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock
 		FROM article
 		WHERE id=?
-	`, id).Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
+	`, id))
 
 	return
 }
 
 func GetArticlesByCategory(category string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
 		FROM category_has_subcategories c
 		INNER JOIN subcategory_has_articles s
 		ON c.subcategory=s.subcategory
@@ -164,25 +167,14 @@ func GetArticlesByCategory(category string) (articles []Article, err error) {
 
 	defer rows.Close()
 
-	for rows.Next() {
-		article := Article{}
+	articles, err = scanArticles(rows)
 
-		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		articles = append(articles, article)
-	}
-
-	err = rows.Err()
 	return
 }
 
 func GetArticlesBySubcategory(subcategory string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
 		FROM subcategory_has_articles s
 		INNER JOIN article a
 		ON s.article=a.id
@@ -195,18 +187,7 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 
 	defer rows.Close()
 
-	for rows.Next() {
-		article := Article{}
+	articles, err = scanArticles(rows)
 
-		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &article.Category, &article.Subcategory)
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		articles = append(articles, article)
-	}
-
-	err = rows.Err()
 	return
 }
