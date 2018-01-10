@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"log"
+	"go/ast"
 )
 
 type Article struct {
@@ -16,6 +17,13 @@ type Article struct {
 	InStock     uint64
 }
 
+type Rating struct {
+	Id 			int64
+	Article		int64
+	nr_up		int64
+	nr_down		int64
+}
+
 func NewArticle(name, description string, price float64, imageName string, categoryName string, subcategoryName string, inStock uint64) Article {
 	return Article{
 		Name:        name,
@@ -26,6 +34,12 @@ func NewArticle(name, description string, price float64, imageName string, categ
 		Subcategory: NewSubcategory(subcategoryName),
 		InStock:     inStock,
 	}
+}
+
+func scanRatings(row *sql.Row)(rating []Rating, err error){
+	row.Scan(&rating.Id, &rating.Article, &rating.nr_up, &rating.nr_down)
+
+	return
 }
 
 func scanArticle(row *sql.Row) (article Article, err error) {
@@ -190,4 +204,48 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 	articles, err = scanArticles(rows)
 
 	return
+}
+
+func GetArticleRating(article Article) (rating []Rating, err error) {
+	rows, err := database.Query(`
+		SELECT nr_up, nr_down
+		FROM article_has_rating
+		WHERE article=(?)`, &article.Id)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	rating, err = scanRatings(rows)
+
+	return
+}
+
+func UserHasRated(article Article)(rated []Article, err error){
+	rows, err := database.Query(`
+		SELECT customer
+		FROM customer_has_rated
+		WHERE article=(?)`, &article.Id)
+
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	rated, err = scanArticles(rows)
+
+	return
+}
+
+/*type Article struct {
+	Id          int64
+	Name        string
+	Description string
+	Price       float64
+	ImageName   string
+	Category    Category
+	Subcategory Subcategory
+	InStock     uint64
 }
