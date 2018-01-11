@@ -220,7 +220,7 @@ func UserHasRated(customerId, articleId int64)(rated bool, err error){
 }
 
 func UserRatedUp (customerId, articleId int64)(err error){
-	if UserHasRated(customerId, articleId){
+	if ok,_ :=UserHasRated(customerId, articleId); ok{
 		result, err := database.Exec(`
 		INSERT INTO customer_has_rated
 		(customer, article, rated)
@@ -238,7 +238,7 @@ func UserRatedUp (customerId, articleId int64)(err error){
 }
 
 func UserRatedDown (customerId, articleId int64)(){
-	if UserHasRated(customerId, articleId){
+	if ok,_:=UserHasRated(customerId, articleId); ok{
 		result, err := database.Exec(`
 		INSERT INTO customer_has_rated
 		(customer, article, rated)
