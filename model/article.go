@@ -99,6 +99,16 @@ func PutArticle(article Article) (Article, error) {
 	return article, err
 }
 
+func SetStockById(id int64, stock uint) (err error) {
+	_, err = database.Exec(`
+		UPDATE article
+		SET in_stock=?
+		WHERE id=?
+	`, &stock, &id)
+
+	return
+}
+
 func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, err error) {
 	rows, err := database.Query(`
 		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock

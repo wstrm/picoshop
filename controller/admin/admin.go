@@ -38,7 +38,7 @@ type rootData struct {
 
 type registerData helper.RegisterResult
 
-type articleData struct {
+type createArticleData struct {
 	Error       string
 	Name        string
 	Description string
@@ -95,7 +95,7 @@ func randomString(length int) string {
 func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet:
-		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop", Data: articleData{}})
+		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop", Data: createArticleData{}})
 	case http.MethodPost:
 		request.ParseMultipartForm(32 << 20)
 
@@ -159,7 +159,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		}
 
 		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop",
-			Data: articleData{
+			Data: createArticleData{
 				Name:        name,
 				Description: description,
 				Price:       price,
