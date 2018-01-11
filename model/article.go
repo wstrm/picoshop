@@ -36,7 +36,7 @@ func NewArticle(name, description string, price float64, imageName string, categ
 	}
 }
 
-func scanRatings(row *sql.Row)(rating []Rating, err error){
+func scanRatings(row *sql.Row, rating Rating)(ratings []Rating, err error){
 	row.Scan(&rating.Id, &rating.Article, &rating.nr_up, &rating.nr_down)
 
 	return
@@ -208,7 +208,7 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 
 func GetArticleRating(article Article) (rating []Rating, err error) {
 	rows, err := database.Query(`
-		SELECT nr_up, nr_down
+		SELECT id, article, nr_up, nr_down
 		FROM article_has_rating
 		WHERE article=(?)`, &article.Id)
 	if err != nil {
@@ -217,24 +217,28 @@ func GetArticleRating(article Article) (rating []Rating, err error) {
 
 	defer rows.Close()
 
-	rating, err = scanRatings(rows)
+	rating, err = scanRatings(rows, rating)
 
 	return
 }
 
-func UserHasRated(article Article)(rated []Article, err error){
+func UserHasRated(article Article)(rated, err error){
 	rows, err := database.Query(`
 		SELECT customer
 		FROM customer_has_rated
 		WHERE article=(?)`, &article.Id)
 
 	if err != nil {
+		rated := false
+		return
+	}
+	if rows != nil {
+		rated :=  true
 		return
 	}
 
 	defer rows.Close()
 
-	rated, err = scanArticles(rows)
 
 	return
 }
