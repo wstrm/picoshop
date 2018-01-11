@@ -6,6 +6,8 @@
 	<img class="article" src="/static/image/{{ .ImageName }}" alt="{{ .Name }} image"></img>
 	<p>{{ .Description }}</p>
 	<h3>Price: {{ .Price }}</h3>
+	<small>Up votes: {{ .NrUp}}</small>
+	<small>Down votes: {{ .NrDown}}</small>
 	<small>In stock: {{ .InStock }}</small>
 	{{ if (context "Customer") }}
 	<form action="/cart?article={{ .Id }}" method="PUT">

@@ -66,19 +66,10 @@ CREATE TABLE IF NOT EXISTS article (
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
 	subcategory VARCHAR(255) NOT NULL,
-	in_stock INT UNSIGNED DEFAULT 0);
+	in_stock INT UNSIGNED DEFAULT 0),
+	nr_up INT UNSIGNED DEFAULT 0 NOT NULL,
+	nr_down INT UNSIGNED DEFAULT 0 NOT NULL;
 
-/* Create article_has_rating table */
-CREATE TABLE IF NOT EXISTS article_has_rating (
-	PRIMARY KEY (id),
-	FOREIGN KEY (article)
-		REFERENCES article(id)
-		ON DELETE CASCADE,
-
-	id INT AUTO_INCREMENT,
-	article INT NOT NULL,
-	nr_up INT UNSIGNED DEFAULT 0,
-	nr_down INT UNSIGNED DEFAULT 0);
 
 /* Create customer_has_rated type table */
 CREATE TABLE IF NOT EXISTS customer_has_rated (
