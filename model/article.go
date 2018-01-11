@@ -198,11 +198,11 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 }
 
 
-func UserHasRated(article Article)(rated bool, err error){
+func UserHasRated(customerId, articleId int64)(rated bool, err error){
 	rows, err := database.Query(`
 		SELECT customer
 		FROM customer_has_rated
-		WHERE article=(?)`, &article.Id)
+		WHERE article=? AND customer=?`, &articleId, &customerId)
 
 	if err != nil {
 		rated := false
@@ -215,6 +215,42 @@ func UserHasRated(article Article)(rated bool, err error){
 
 	defer rows.Close()
 
+
+	return
+}
+
+func UserRatedUp (customerId, articleId int64)(err error){
+	if UserHasRated(customerId, articleId){
+		result, err := database.Exec(`
+		INSERT INTO customer_has_rated
+		(customer, article, rated)
+		VALUES
+		(?, ?, ?)`, &customerId, &articleId, 1)
+
+
+	_, err := database.Exec(`
+		UPDATE article.nr_up
+		WHERE id = ?
+		VALUES nr_up=nr_up + 1`, &articleId)
+	}
+
+	return
+}
+
+func UserRatedDown (customerId, articleId int64)(){
+	if UserHasRated(customerId, articleId){
+		result, err := database.Exec(`
+		INSERT INTO customer_has_rated
+		(customer, article, rated)
+		VALUES
+		(?, ?, ?)`, &customerId, &articleId, -1)
+
+
+		_, err := database.Exec(`
+		UPDATE article.nr_down
+		WHERE id = ?
+		VALUES nr_down=nr_down + 1`, &articleId)
+		}
 
 	return
 }
