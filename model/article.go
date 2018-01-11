@@ -228,7 +228,7 @@ func UserRatedUp (customerId, articleId int64)(err error){
 		(?, ?, ?)`, &customerId, &articleId, 1)
 
 
-	_, err := database.Exec(`
+		_, err := database.Exec(`
 		UPDATE article.nr_up
 		WHERE id = ?
 		VALUES nr_up=nr_up + 1`, &articleId)
