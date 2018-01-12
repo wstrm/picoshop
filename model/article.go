@@ -15,14 +15,10 @@ type Article struct {
 	Category    Category
 	Subcategory Subcategory
 	InStock     uint64
+	NrUp		uint64
+	NrDown 		uint64
 }
 
-type Rating struct {
-	Id 			int64
-	Article		int64
-	nr_up		int64
-	nr_down		int64
-}
 
 func NewArticle(name, description string, price float64, imageName string, categoryName string, subcategoryName string, inStock uint64) Article {
 	return Article{
@@ -36,15 +32,10 @@ func NewArticle(name, description string, price float64, imageName string, categ
 	}
 }
 
-func scanRatings(row *sql.Row, rating Rating)(ratings []Rating, err error){
-	row.Scan(&rating.Id, &rating.Article, &rating.nr_up, &rating.nr_down)
-
-	return
-}
 
 func scanArticle(row *sql.Row) (article Article, err error) {
 	var categoryName, subcategoryName string
-	row.Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock)
+	row.Scan(&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock, &article.NrUp, &article.NrDown)
 
 	article.Category = NewCategory(categoryName)
 	article.Subcategory = NewSubcategory(subcategoryName)
@@ -75,7 +66,7 @@ func scanArticles(rows *sql.Rows) (articles []Article, err error) {
 
 func SearchForArticles(query string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT id, name, description, price, image_name, category, subcategory, in_stock
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock, nr_up, nr_down
 		FROM article WHERE name LIKE ?`, "%"+query+"%")
 	if err != nil {
 		return
@@ -125,7 +116,7 @@ func SetStockById(id int64, stock uint64) (err error) {
 
 func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock, nr_up, nr_down
 		FROM subcategory s
 		WHERE s.id=?
 
@@ -148,7 +139,7 @@ func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, er
 
 func GetArticleHighlights(n uint) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT id, name, description, price, image_name, category, subcategory, in_stock
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock, nr_up, nr_down
 		FROM article
 		WHERE rand() <= 0.3
 		LIMIT ?
@@ -166,7 +157,7 @@ func GetArticleHighlights(n uint) (articles []Article, err error) {
 
 func GetArticleById(id int64) (article Article, err error) {
 	article, err = scanArticle(database.QueryRow(`
-		SELECT id, name, description, price, image_name, category, subcategory, in_stock
+		SELECT id, name, description, price, image_name, category, subcategory, in_stock, nr_up, nr_down
 		FROM article
 		WHERE id=?
 	`, id))
@@ -176,7 +167,7 @@ func GetArticleById(id int64) (article Article, err error) {
 
 func GetArticlesByCategory(category string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock, a.nr_up, a.nr_down
 		FROM category_has_subcategories c
 		INNER JOIN subcategory_has_articles s
 		ON c.subcategory=s.subcategory
@@ -198,7 +189,7 @@ func GetArticlesByCategory(category string) (articles []Article, err error) {
 
 func GetArticlesBySubcategory(subcategory string) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock, a.nr_up, a.nr_down
 		FROM subcategory_has_articles s
 		INNER JOIN article a
 		ON s.article=a.id
@@ -216,27 +207,12 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 	return
 }
 
-func GetArticleRating(article Article) (rating []Rating, err error) {
-	rows, err := database.Query(`
-		SELECT id, article, nr_up, nr_down
-		FROM article_has_rating
-		WHERE article=(?)`, &article.Id)
-	if err != nil {
-		return
-	}
 
-	defer rows.Close()
-
-	rating, err = scanRatings(rows, rating)
-
-	return
-}
-
-func UserHasRated(article Article)(rated, err error){
+func UserHasRated(customerId, articleId int64)(rated bool, err error){
 	rows, err := database.Query(`
 		SELECT customer
 		FROM customer_has_rated
-		WHERE article=(?)`, &article.Id)
+		WHERE article=? AND customer=?`, &articleId, &customerId)
 
 	if err != nil {
 		rated := false
@@ -253,13 +229,38 @@ func UserHasRated(article Article)(rated, err error){
 	return
 }
 
-/*type Article struct {
-	Id          int64
-	Name        string
-	Description string
-	Price       float64
-	ImageName   string
-	Category    Category
-	Subcategory Subcategory
-	InStock     uint64
+func UserRatedUp (customerId, articleId int64)(err error){
+	if ok,_ :=UserHasRated(customerId, articleId); ok{
+		result, err := database.Exec(`
+		INSERT INTO customer_has_rated
+		(customer, article, rated)
+		VALUES
+		(?, ?, ?)`, &customerId, &articleId, 1)
+
+
+		_, err := database.Exec(`
+		UPDATE article.nr_up
+		WHERE id = ?
+		VALUES nr_up=nr_up + 1`, &articleId)
+	}
+
+	return
+}
+
+func UserRatedDown (customerId, articleId int64)(){
+	if ok,_:=UserHasRated(customerId, articleId); ok{
+		result, err := database.Exec(`
+		INSERT INTO customer_has_rated
+		(customer, article, rated)
+		VALUES
+		(?, ?, ?)`, &customerId, &articleId, -1)
+
+
+		_, err := database.Exec(`
+		UPDATE article.nr_down
+		WHERE id = ?
+		VALUES nr_down=nr_down + 1`, &articleId)
+		}
+
+	return
 }
