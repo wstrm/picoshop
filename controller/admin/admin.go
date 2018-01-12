@@ -38,15 +38,18 @@ type rootData struct {
 
 type registerData helper.RegisterResult
 
-type createArticleData struct {
-	Error       string
-	Name        string
-	Description string
-	Price       string
-	Id          int64
-	Category    string
-	Subcategory string
-	InStock     string
+type articleData struct {
+	CreateError   string
+	StockError    string
+	CreateSuccess bool
+	StockSuccess  bool
+	Name          string
+	Description   string
+	Price         string
+	Id            int64
+	Category      string
+	Subcategory   string
+	InStock       string
 }
 
 func (a *rootHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -93,9 +96,17 @@ func randomString(length int) string {
 }
 
 func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	switch request.Method {
+	method := request.Method
+	switch request.FormValue("_method") {
+	case http.MethodPut:
+		method = http.MethodPut
+	case http.MethodDelete:
+		method = http.MethodDelete
+	}
+
+	switch method {
 	case http.MethodGet:
-		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop", Data: createArticleData{}})
+		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop", Data: articleData{}})
 	case http.MethodPost:
 		request.ParseMultipartForm(32 << 20)
 
@@ -159,12 +170,45 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		}
 
 		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop",
-			Data: createArticleData{
-				Name:        name,
-				Description: description,
-				Price:       price,
-				Id:          article.Id,
+			Data: articleData{
+				Name:          name,
+				Description:   description,
+				Price:         price,
+				Id:            article.Id,
+				CreateSuccess: true,
 			}})
+	case http.MethodPut:
+		data := articleData{
+			InStock: request.FormValue("in-stock"),
+		}
+
+		inStock, err := strconv.ParseUint(data.InStock, 10, 64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, "Invalid in stock data", http.StatusBadRequest)
+			return
+		}
+
+		articleId, err := strconv.ParseInt(request.FormValue("id"), 10, 64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, "Invalid article id", http.StatusBadRequest)
+			return
+		}
+		data.Id = articleId
+
+		err = model.SetStockById(articleId, inStock)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		data.StockSuccess = true
+		view.Render(request.Context(), writer, "admin.article", view.Page{Title: "Admin - Picoshop",
+			Data: data,
+		})
+
 	}
 }
 

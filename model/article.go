@@ -99,7 +99,7 @@ func PutArticle(article Article) (Article, error) {
 	return article, err
 }
 
-func SetStockById(id int64, stock uint) (err error) {
+func SetStockById(id int64, stock uint64) (err error) {
 	_, err = database.Exec(`
 		UPDATE article
 		SET in_stock=?

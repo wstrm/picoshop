@@ -3,13 +3,20 @@
 <div class = "midbox">
 	<h3>Administration panel</h3>
 
-	<h4>Add new article</h4>
-
-{{ if (and (eq .Data.CreateError "") .Data.Name .Data.Id) }}
+{{ if .Data.CreateSuccess }}
 	{{ template "success" (printf "Created new article %s with the ID %d" .Data.Name .Data.Id) }}
-{{ else }}
+{{ end }}
+{{ if .Data.StockSuccess }}
+	{{ template "success" (printf "Changed stock to %s for article with the ID %d" .Data.InStock .Data.Id) }}
+{{ end }}
+{{ if .Data.StockError }}
+	{{ template "error" .Data.StockError }}
+{{ end }}
+{{ if .Data.CreateError }}
 	{{ template "error" .Data.CreateError }}
+{{ end }}
 
+	<h4>Add new article</h4>
 	<form action="/admin/article" method="POST" enctype="multipart/form-data">
 		<div>
 			<label for="name">Name:</label>
@@ -58,7 +65,7 @@
 		</div>
 		<div>
 			<label for="stock">Stock:</label>
-			<input type="number" id="stock" name="stock">
+			<input type="number" id="in-stock" name="in-stock">
 		</div>
 
 		<div>
@@ -66,6 +73,5 @@
 		</div>
 	</form>
 </div>
-{{ end }}
 
 {{ template "footer" }}
