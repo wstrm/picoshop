@@ -113,7 +113,7 @@ func SetStockById(id int64, stock uint64) (err error) {
 
 func GetArticlesFromSubcategory(subcategory Subcategory) (articles []Article, err error) {
 	rows, err := database.Query(`
-		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock, nr_up, nr_down
+		SELECT a.id, a.name, a.description, a.price, a.image_name, a.category, a.subcategory, a.in_stock, a.nr_up, a.nr_down
 		FROM subcategory s
 		WHERE s.id=?
 
