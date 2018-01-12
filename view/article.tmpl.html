@@ -33,17 +33,21 @@
 	{{ if (context "Customer") }}
 
 
-	<form action="/article?vote=up={{ .Id}}" method="PUT">
+	{{ if not $.Data.HasRated }}
+	<form action="/article" method="PUT">
 		<input type="hidden" name="_method" value="PUT">
+		<input type="hidden" name="id" value="{{ .Id }}">
 		<input type="hidden" name="vote" value="up">
 		<button type="submit">Up vote</button>
 	</form>
 
-	<form action="/article?vote=down={{ .Id}}" method="PUT">
+	<form action="/article" method="PUT">
 		<input type="hidden" name="_method" value="PUT">
+		<input type="hidden" name="id" value="{{ .Id }}">
 		<input type="hidden" name="vote" value="down">
 		<button type="submit">Down vote</button>
 	</form>
+	{{ end }}
 
 	<form action="/article?id={{ .Id }}" method="POST">
 		<label for="comment">Post a comment:</label>

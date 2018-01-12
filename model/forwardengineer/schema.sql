@@ -66,9 +66,9 @@ CREATE TABLE IF NOT EXISTS article (
 	image_name VARCHAR(255) NOT NULL,
 	category VARCHAR(255) NOT NULL,
 	subcategory VARCHAR(255) NOT NULL,
-	in_stock INT UNSIGNED DEFAULT 0),
+	in_stock INT UNSIGNED DEFAULT 0,
 	nr_up INT UNSIGNED DEFAULT 0 NOT NULL,
-	nr_down INT UNSIGNED DEFAULT 0 NOT NULL;
+	nr_down INT UNSIGNED DEFAULT 0 NOT NULL);
 
 
 /* Create customer_has_rated type table */

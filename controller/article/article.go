@@ -17,6 +17,7 @@ type articleData struct {
 	Error    string
 	Article  model.Article
 	Comments []model.Comment
+	HasRated bool
 }
 
 func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -29,17 +30,20 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		}
 
-		article, err := model.GetArticleById(id64)
-		if err != nil {
-			log.Println(err)
-			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		customer, customerOk := request.Context().Value("Customer").(model.Customer)
+
+		method := request.Method
+		switch request.FormValue("_method") {
+		case http.MethodPut:
+			method = http.MethodPut
+		case http.MethodDelete:
+			method = http.MethodDelete
 		}
 
-		switch request.Method {
+		switch method {
 		case http.MethodGet: // Just render page
 		case http.MethodPost: // Add comment
-			customer, ok := request.Context().Value("Customer").(model.Customer)
-			if !ok {
+			if !customerOk {
 				http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
@@ -56,7 +60,33 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 					return
 				}
 			}
+		case http.MethodPut: // Vote
+			if !customerOk {
+				http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+
+			vote := request.FormValue("vote")
+			var err error
+			if vote == "up" {
+				err = model.UserRateUp(customer.Id, id64)
+			} else if vote == "down" {
+				err = model.UserRateDown(customer.Id, id64)
+			}
+
+			if err != nil {
+				log.Println(err)
+				http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
 		}
+
+		article, err := model.GetArticleById(id64)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		}
+
+		hasRated, _ := model.UserHasRated(customer.Id, id64)
 
 		comments, err := model.GetCommentsByArticleId(id64)
 		if err != nil {
@@ -70,6 +100,7 @@ func (a *articleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 				Error:    "",
 				Article:  article,
 				Comments: comments,
+				HasRated: hasRated,
 			},
 		})
 		return

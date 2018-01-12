@@ -3,7 +3,6 @@ package model
 import (
 	"database/sql"
 	"log"
-	"go/ast"
 )
 
 type Article struct {
@@ -15,10 +14,9 @@ type Article struct {
 	Category    Category
 	Subcategory Subcategory
 	InStock     uint64
-	NrUp		uint64
-	NrDown 		uint64
+	NrUp        uint64
+	NrDown      uint64
 }
-
 
 func NewArticle(name, description string, price float64, imageName string, categoryName string, subcategoryName string, inStock uint64) Article {
 	return Article{
@@ -31,7 +29,6 @@ func NewArticle(name, description string, price float64, imageName string, categ
 		InStock:     inStock,
 	}
 }
-
 
 func scanArticle(row *sql.Row) (article Article, err error) {
 	var categoryName, subcategoryName string
@@ -50,7 +47,7 @@ func scanArticles(rows *sql.Rows) (articles []Article, err error) {
 		article = Article{}
 
 		err = rows.Scan(
-			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock)
+			&article.Id, &article.Name, &article.Description, &article.Price, &article.ImageName, &categoryName, &subcategoryName, &article.InStock, &article.NrUp, &article.NrDown)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -207,60 +204,64 @@ func GetArticlesBySubcategory(subcategory string) (articles []Article, err error
 	return
 }
 
+func UserHasRated(customerId, articleId int64) (rated bool, err error) {
+	var customer int64
 
-func UserHasRated(customerId, articleId int64)(rated bool, err error){
-	rows, err := database.Query(`
-		SELECT customer
-		FROM customer_has_rated
-		WHERE article=? AND customer=?`, &articleId, &customerId)
+	err = database.QueryRow(`
+	SELECT customer
+	FROM customer_has_rated
+	WHERE article=? AND customer=?
+	`, &articleId, &customerId).Scan(&customer)
 
-	if err != nil {
-		rated := false
-		return
-	}
-	if rows != nil {
-		rated :=  true
-		return
-	}
-
-	defer rows.Close()
-
-
-	return
-}
-
-func UserRatedUp (customerId, articleId int64)(err error){
-	if ok,_ :=UserHasRated(customerId, articleId); ok{
-		result, err := database.Exec(`
-		INSERT INTO customer_has_rated
-		(customer, article, rated)
-		VALUES
-		(?, ?, ?)`, &customerId, &articleId, 1)
-
-
-		_, err := database.Exec(`
-		UPDATE article.nr_up
-		WHERE id = ?
-		VALUES nr_up=nr_up + 1`, &articleId)
+	if err == nil {
+		rated = true // rated false by default
 	}
 
 	return
 }
 
-func UserRatedDown (customerId, articleId int64)(){
-	if ok,_:=UserHasRated(customerId, articleId); ok{
-		result, err := database.Exec(`
+func UserRateUp(customerId, articleId int64) (err error) {
+	if rated, _ := UserHasRated(customerId, articleId); !rated {
+		// should be done as a transaction
+		_, err = database.Exec(`
 		INSERT INTO customer_has_rated
 		(customer, article, rated)
 		VALUES
-		(?, ?, ?)`, &customerId, &articleId, -1)
-
-
-		_, err := database.Exec(`
-		UPDATE article.nr_down
-		WHERE id = ?
-		VALUES nr_down=nr_down + 1`, &articleId)
+		(?, ?, ?)
+		`, &customerId, &articleId, 1)
+		if err != nil {
+			return
 		}
+
+		_, err = database.Exec(`
+		UPDATE article
+		SET nr_up=nr_up + 1
+		WHERE id=?
+		`, &articleId)
+	}
+
+	return
+}
+
+func UserRateDown(customerId, articleId int64) (err error) {
+	if rated, _ := UserHasRated(customerId, articleId); !rated {
+		// should be done as a transaction
+		_, err = database.Exec(`
+		INSERT INTO customer_has_rated
+		(customer, article, rated)
+		VALUES
+		(?, ?, ?)
+		`, &customerId, &articleId, -1)
+		if err != nil {
+			return
+		}
+
+		_, err = database.Exec(`
+		UPDATE article
+		SET nr_down=nr_down + 1
+		WHERE id=?
+		`, &articleId)
+	}
 
 	return
 }
