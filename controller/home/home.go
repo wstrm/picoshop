@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"log"
 
-	"github.com/willeponken/picoshop/view"
-	"github.com/willeponken/picoshop/model"
+	"github.com/wstrm/picoshop/view"
+	"github.com/wstrm/picoshop/model"
 )
 
 type homeHandler struct {

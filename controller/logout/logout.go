@@ -3,7 +3,7 @@ package logout
 import (
 	"net/http"
 
-	"github.com/willeponken/picoshop/middleware/auth"
+	"github.com/wstrm/picoshop/middleware/auth"
 )
 
 type logoutHandler struct {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/willeponken/picoshop/session"
+	"github.com/wstrm/picoshop/session"
 )
 
 type User interface {
@@ -16,7 +16,7 @@ type User interface {
 
 type Manager struct {
 	cookieName string
-	// TODO(willeponken): benchmark vs. something like map[userKey]bool
+	// TODO(wstrm): benchmark vs. something like map[userKey]bool
 	supportedUsers []string // short array - should be faster than hash map (?)
 }
 

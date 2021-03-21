@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/willeponken/picoshop/model"
-	"github.com/willeponken/picoshop/view"
+	"github.com/wstrm/picoshop/model"
+	"github.com/wstrm/picoshop/view"
 )
 
 type orderHandler struct {
@@ -36,7 +36,7 @@ func (o *orderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			return
 		}
 
-		// TODO(willeponken): query only user specific orders
+		// TODO(wstrm): query only user specific orders
 		allOrders, err := model.GetAllOrders()
 		if err != nil {
 			log.Panicln(err)

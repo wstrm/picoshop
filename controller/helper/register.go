@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/willeponken/picoshop/middleware/auth"
-	"github.com/willeponken/picoshop/model"
+	"github.com/wstrm/picoshop/middleware/auth"
+	"github.com/wstrm/picoshop/model"
 )
 
 type RegisterForm struct {

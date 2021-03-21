@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/willeponken/picoshop/controller"
-	"github.com/willeponken/picoshop/model"
+	"github.com/wstrm/picoshop/controller"
+	"github.com/wstrm/picoshop/model"
 )
 
 type flags struct {

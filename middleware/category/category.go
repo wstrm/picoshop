@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/willeponken/picoshop/model"
+	"github.com/wstrm/picoshop/model"
 )
 
 func Middleware(next http.Handler) http.Handler {

@@ -3,7 +3,7 @@ package helper_test
 import (
 	"testing"
 
-	"github.com/willeponken/picoshop/controller/helper"
+	"github.com/wstrm/picoshop/controller/helper"
 )
 
 func TestIsFilled(t *testing.T) {

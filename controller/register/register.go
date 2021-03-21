@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/willeponken/picoshop/controller/helper"
-	"github.com/willeponken/picoshop/middleware/auth"
-	"github.com/willeponken/picoshop/view"
+	"github.com/wstrm/picoshop/controller/helper"
+	"github.com/wstrm/picoshop/middleware/auth"
+	"github.com/wstrm/picoshop/view"
 )
 
 type registerHandler struct {

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/willeponken/picoshop/model"
-	"github.com/willeponken/picoshop/view"
+	"github.com/wstrm/picoshop/model"
+	"github.com/wstrm/picoshop/view"
 )
 
 type categoryHandler struct {

@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/willeponken/picoshop/model/forwardengineer"
+	"github.com/wstrm/picoshop/model/forwardengineer"
 )
 
 // sql.DB is thread-safe
@@ -17,7 +17,7 @@ var database *sql.DB
 // driver defines a SQL driver to use
 const driver = "mysql"
 
-//go:generate go run $GOPATH/src/github.com/willeponken/picoshop/cmd/inlinesql/main.go -f forwardengineer/schema.sql -p forwardengineer -o forwardengineer/schema.go
+//go:generate go run $GOPATH/src/github.com/wstrm/picoshop/cmd/inlinesql/main.go -f forwardengineer/schema.sql -p forwardengineer -o forwardengineer/schema.go
 // Open initializes a database connection and forward engineers the ̈́'picoshop' schema with a table setup
 func Open(source string) error {
 	config, err := mysql.ParseDSN(source)

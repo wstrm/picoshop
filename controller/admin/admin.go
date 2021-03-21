@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/willeponken/picoshop/controller/helper"
-	"github.com/willeponken/picoshop/model"
-	"github.com/willeponken/picoshop/view"
+	"github.com/wstrm/picoshop/controller/helper"
+	"github.com/wstrm/picoshop/model"
+	"github.com/wstrm/picoshop/view"
 )
 
 var (
