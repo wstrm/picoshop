@@ -1,0 +1,12 @@
+github.com/go-sql-driver/mysql v1.3.0 h1:pgwjLi/dvffoP9aabwkT3AKpXQM93QARkjFhDDqC1UE=
+github.com/go-sql-driver/mysql v1.3.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
+github.com/gorilla/context v0.0.0-20160226214623-1ea25387ff6f h1:9oNbS1z4rVpbnkHBdPZU4jo9bSmrLpII768arSyMFgk=
+github.com/gorilla/context v0.0.0-20160226214623-1ea25387ff6f/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
+github.com/gorilla/securecookie v0.0.0-20160422134519-667fe4e3466a h1:YH0IojQwndMQdeRWdw1aPT8bkbiWaYR3WD+Zf5e09DU=
+github.com/gorilla/securecookie v0.0.0-20160422134519-667fe4e3466a/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
+github.com/gorilla/sessions v0.0.0-20160922145804-ca9ada445741 h1:OuuPl66BpF1q3OEkaPpp+VfzxrBBY62ATGdWqql/XX8=
+github.com/gorilla/sessions v0.0.0-20160922145804-ca9ada445741/go.mod h1:+WVp8kdw6VhyKExm03PAMRn2ZxnPtm58pV0dBVPdhHE=
+github.com/willeponken/picoshop v0.0.0-20180112040331-05ad82201439 h1:SSGXrJ7ZDKzo7v1ErgJSYrp5fhII+oVnkTRfzr4GM1s=
+github.com/willeponken/picoshop v0.0.0-20180112040331-05ad82201439/go.mod h1:/WvqmWDHgFvk6Owj626kbLzqRpkGmn8v8GODwrF55Ow=
+golang.org/x/crypto v0.0.0-20171124090802-b080dc9a8c48 h1:JXhV1Hc3netKxmNmjw5GfreRuZzbij+07KH+qhoTyhQ=
+golang.org/x/crypto v0.0.0-20171124090802-b080dc9a8c48/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
