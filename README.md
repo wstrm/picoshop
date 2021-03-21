@@ -6,10 +6,6 @@ Minimalistic web shop.
 ### Prerequisites
  * Download and install Go
 
-### Dependency management
- * Install dep `go get -u github.com/golang/dep/cmd/dep`
- * Run `dep ensure` and you're good to go!
-
 ### Database setup
 Picoshop forward engineers table creation. You have to create the schema and user though.
 #### Create schema
@@ -27,14 +23,14 @@ GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,REFERENCES,INDEX,EVENT,DROP,
  * Run `picoshopd` with `go run cmd/picoshopd/main.go -address=:9090 -source 'picoshop:<password here>@tcp(127.0.0.1:3306)/picoshop'`
 
 ## Project status
-| Build status | Test coverage |
-|:------------:|:-------------:|
-| [![Build Status](https://travis-ci.org/willeponken/picoshop.svg?branch=master)](https://travis-ci.org/willeponken/picoshop) | [![Coverage Status](https://coveralls.io/repos/github/willeponken/picoshop/badge.svg?branch=master)](https://coveralls.io/github/willeponken/picoshop?branch=master) |
+| Build status |
+|:------------:|
+| [![Build Status](https://travis-ci.org/wstrm/picoshop.svg?branch=master)](https://travis-ci.org/wstrm/picoshop) |
 
 ## Project structure
 
 ### Code
-![Code project structure tree](https://github.com/willeponken/picoshop/blob/master/doc/patterns/picoshop-project-structure_rev1.png)
+![Code project structure tree](https://github.com/wstrm/picoshop/blob/master/doc/patterns/picoshop-project-structure_rev1.png)
 
 <details>
 <summary>Description</summary>
@@ -51,4 +47,4 @@ GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,REFERENCES,INDEX,EVENT,DROP,
 </details>
 
 ### Database
-![Database ER scheme](https://github.com/willeponken/picoshop/blob/master/doc/database/picoshop_mysql-sql-eer-diagram_rev3.png)
+![Database ER scheme](https://github.com/wstrm/picoshop/blob/master/doc/database/picoshop_mysql-sql-eer-diagram_rev3.png)
